@@ -90,7 +90,7 @@ function App () {
     e.preventDefault()
     const data = new FormData(e.target)
     const name = data.get('name')
-    alert(`こんにちは、${name}さん`)
+    alert("こんにちは、" + name + "さん")
   }
 
   return (
@@ -129,7 +129,7 @@ function App () {
     const data = new FormData(e.target)
     const name = data.get('name')
     const age = data.get('age')
-    alert(`${name}さん(${age})`)
+    alert(name + "さん(" + age + ")")
   }
 
   return (
@@ -170,7 +170,8 @@ function App () {
     const data = new FormData(e.target)
     const name = data.get('name')
     const age = data.get('age')
-    alert(`${name}さん(${age})`)
+
+    alert(name + "さん(" + age + ")")
   }
 
   return (
@@ -212,7 +213,7 @@ function App () {
   })
 
   function handleChange (e) {
-    const data = new FormData(e.target)
+    const data = new FormData(e.target.form)
     const name = data.get('name')
     const age = data.get('age')
     setValues({
@@ -275,7 +276,7 @@ function App () {
   })
 
   function handleChange (e) {
-    const data = new FormData(e.target)
+    const data = new FormData(e.target.form)
     const name = data.get('name')
     const age = data.get('age')
 
@@ -394,7 +395,7 @@ function App () {
   })
 
   function handleChange (e) {
-    const data = new FormData(e.target)
+    const data = new FormData(e.target.form)
     const name = data.get('name')
     const age = data.get('age')
 
