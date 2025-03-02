@@ -571,3 +571,44 @@ export default Product
 ```
 
 セール画面から各商品ページにアクセスできることを確認してください。
+
+
+# 理解の確認
+
+セールも商品と同様にパスパラメータによって表示を切り替えられるようにしましょう。
+
+セールごとに商品を切り替えましょう。
+
+```js
+const productsBySaleName = {
+  'monthlydealevent': [{
+    id: 'B09M2XFRCF',
+    name: 'ポップコーン',
+    price: 1000,
+    description: 'おいしいポップコーンです。'
+  }, {
+    id: 'X00X0XXXXX',
+    name: 'コーラ',
+    price: 300,
+    description: '普通のコーラです。'
+  }],
+  'specialevent': [{
+    id: 'Y00Y0YYYYY',
+    name: 'ポテトチップス',
+    price: 200,
+    description: 'おいしいポテトチップスです。'
+  }, {
+    id: 'Z00Z0ZZZZZ',
+    name: 'オレンジジュース',
+    price: 400,
+    description: 'おいしいオレンジジュースです。'
+  }]
+}
+
+```
+
+# まとめ
+
+ここではパスによって画面を切り替える方法を react-router-dom を使って実装しました。
+
+パスによって表示を切り替えるだけではなく
