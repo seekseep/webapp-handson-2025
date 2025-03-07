@@ -326,7 +326,7 @@ function App () {
         address="奈良県"
         age="22" />
       <Profile
-        name="町田章介"
+        name="町田長介"
         introduction="ゴルフクラブの形が好きで集めている"
         address="和歌山県"
         age="22" />
@@ -368,7 +368,7 @@ const people = [{
     address: "奈良県",
     age: "22"
   }, {
-    name: "町田章介",
+    name: "町田長介",
     introduction: "ゴルフクラブの形が好きで集めている",
     address: "和歌山県",
     age: "22"
@@ -447,7 +447,7 @@ function App () {
         address="奈良県"
         age="22" />
       <Profile
-        name="町田章介"
+        name="町田長介"
         introduction="ゴルフクラブの形が好きで集めている"
         address="和歌山県"
         age="22" />
@@ -495,7 +495,7 @@ function App () {
       age="22" />,
     <Profile
       key={4}
-      name="町田章介"
+      name="町田長介"
       introduction="ゴルフクラブの形が好きで集めている"
       address="和歌山県"
       age="22" />,
@@ -824,7 +824,7 @@ export const people = [{
 
 # まとめ
 
-この章では次のことを学びました。
+この節では次のことを学びました。
 
 - コンポーネントの切り出し
 - 配列を利用したコンポーネントの描画
