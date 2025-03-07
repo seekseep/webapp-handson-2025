@@ -488,7 +488,6 @@ function App () {
   )
 }
 
-
 ```
 
 非同期処理の開始前に `setLoading(true)` を呼び出し、非同期処理の終了後に `setLoading(false)` を呼び出します。
