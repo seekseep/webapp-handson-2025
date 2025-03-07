@@ -224,6 +224,6 @@ function App () {
 
 React の基本的な使い方を学びました。
 
-次はここまで学んだことを使って実際に顧客管理システムを作ってみましょう。
+次はここまで学んだことを使って実際に顧客管理アプリを作ってみましょう。
 
-- [顧客管理システム](../04-practice-only-frontend/01-introduction.md)
+- [顧客管理アプリ](../04-practice-only-frontend/01-introduction.md)
