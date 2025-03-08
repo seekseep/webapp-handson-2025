@@ -68,11 +68,11 @@ erDiagram
 
 ```mermaid
 graph LR
-  CompanyCollection[会社一覧画面] --> CompanySingle[会社単一画面]
+  CompanyCollection[会社一覧画面] --> CompanySingle[会社詳細画面]
   CompanySingle --> TeamCreate[部署作成画面]
-  CompanySingle --> TeamSingle[部署単一画面]
-  TeamSingle --> EmployeeSingle[社員単一画面]
-  TeamSingle --> EmployeeNew[社員単一画面]
+  CompanySingle --> TeamSingle[部署詳細画面]
+  TeamSingle --> EmployeeSingle[社員詳細画面]
+  TeamSingle --> EmployeeNew[社員詳細画面]
 ```
 
 # Web API を使わずに localStorage を使う

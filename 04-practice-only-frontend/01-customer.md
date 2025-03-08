@@ -37,14 +37,14 @@ erDiagram
 
 ```mermaid
 graph LR
-  A[顧客一覧] --> B[顧客単一]
+  A[顧客一覧] --> B[顧客詳細]
   A --> C[顧客登録]
 ```
 
 | 画面名 | 説明 |
 | --- | --- |
 | 顧客一覧 | 顧客の一覧を表示する |
-| 顧客単一 | 顧客の詳細を表示する |
+| 顧客詳細 | 顧客の詳細を表示し、編集と削除を行う |
 | 顧客登録 | 顧客を登録する |
 
 # 機能を考える
@@ -118,7 +118,7 @@ createRoot(document.getElementById('root')).render(
 | パス | コンポーネント | 画面名 |
 | --- | --- | --- |
 | `/` | `CustomerCollection` | 顧客一覧 |
-| `/:id` | `CustomerSingle` | 顧客単一 |
+| `/:id` | `CustomerSingle` | 顧客詳細 |
 | `/new` | `CustomerCreate` | 顧客登録 |
 
 ```jsx
@@ -164,7 +164,7 @@ export default CustomerCollection;
 function CustomerSingle () {
   return (
     <div>
-      <h1>顧客単一</h1>
+      <h1>顧客詳細</h1>
     </div>
   );
 }
@@ -197,7 +197,7 @@ export default CustomerCreate;
 | URL | 画面 |
 | --- | --- |
 | `http://localhost:3000/` | 顧客一覧 |
-| `http://localhost:3000/1` | 顧客単一 |
+| `http://localhost:3000/1` | 顧客詳細 |
 | `http://localhost:3000/new` | 顧客登録 |
 
 # 各画面の遷移
@@ -206,7 +206,7 @@ export default CustomerCreate;
 
 ```mermaid
 graph LR
-  A[顧客一覧] --> B[顧客単一]
+  A[顧客一覧] --> B[顧客詳細]
   A --> C[顧客登録]
 ```
 
@@ -243,7 +243,7 @@ import { Link } from "react-router-dom";
 function CustomerSingle () {
   return (
     <div>
-      <h1>顧客単一</h1>
+      <h1>顧客詳細</h1>
       <hr />
       <Link to="/">顧客一覧に戻る</Link>
     </div>
@@ -568,7 +568,7 @@ export async function getCustomer (id) {
 
 ```
 
-## 顧客単一の表示
+## 顧客詳細の表示
 
 顧客を取得して表示することができます。
 
@@ -600,7 +600,7 @@ function CustomerSingle () {
 
   return (
     <div>
-      <h1>顧客単一</h1>
+      <h1>顧客詳細</h1>
       {error && <p>エラーが発生しました: {error.message}</p>}
       {loading && <p>読み込み中...</p>}
       {customer && (
@@ -612,7 +612,6 @@ function CustomerSingle () {
           <p>住所: {customer.address}</p>
         </div>
       )}
-
       <hr />
       <Link to="/">顧客一覧に戻る</Link>
     </div>
@@ -700,7 +699,7 @@ function CustomerSingle () {
 
   return (
     <div>
-      <h1>顧客単一</h1>
+      <h1>顧客詳細</h1>
       {error && <p>エラーが発生しました: {error.message}</p>}
       {loading && <p>読み込み中...</p>}
       {customer && (
@@ -715,7 +714,7 @@ function CustomerSingle () {
               名前:
               <input
                 type="text" name="name" value={customer.name}
-                onChange={event => setValues({ ...customer, name: event.target.value })} />
+                onChange={event => setCustomer({ ...customer, name: event.target.value })} />
             </label>
           </div>
           <div>
@@ -723,7 +722,7 @@ function CustomerSingle () {
               メールアドレス:
               <input
                 type="email" name="email" value={customer.email}
-                onChange={event => setValues({ ...customer, email: event.target.value })} />
+                onChange={event => setCustomer({ ...customer, email: event.target.value })} />
             </label>
           </div>
           <div>
@@ -731,14 +730,14 @@ function CustomerSingle () {
               電話番号:
               <input
                 type="tel" name="tel" value={customer.tel}
-                onChange={event => setValues({ ...customer, tel: event.target.value })} />
+                onChange={event => setCustomer({ ...customer, tel: event.target.value })} />
             </label>
           </div>
           <div>
             <label>
               住所:
               <textarea name="address" value={customer.address}
-                onChange={event => setValues({ ...customer, address: event.target.value })} />
+                onChange={event => setCustomer({ ...customer, address: event.target.value })} />
             </label>
           </div>
           <button type="submit">保存</button>
@@ -799,7 +798,7 @@ import { getCustomer, updateCustomer } from "../storage";
 
 一度編集して、保存してください。
 
-一覧に戻って再度単一画面に戻って内容が変更されていることを確認してください。
+一覧に戻って再度詳細画面に戻って内容が変更されていることを確認してください。
 
 # 顧客の削除
 
@@ -846,7 +845,7 @@ function CustomerSingle () {
 
   return (
     <div>
-      <h1>顧客単一</h1>
+      <h1>顧客詳細</h1>
       {error && <p>エラーが発生しました: {error.message}</p>}
       {loading && <p>読み込み中...</p>}
       {customer && (
@@ -974,6 +973,8 @@ createRoot(document.getElementById('root')).render(
 
 # まとめ
 
+これでお客さんにプロトタイプを見せることができます。
+
 ここまでで顧客の情報の作成、表示、編集、削除を行いました。
 
 この４つのデータの操作は CRUD と呼ばれて基本的な操作です。今後のこの組み合わせで様々な機能追加を進めていきます。
@@ -984,5 +985,5 @@ createRoot(document.getElementById('root')).render(
 - Delete: 削除
 
 次の章ではここに機能追加をします。
-
+ｓ
 [次の機能追加](./02-team.md)
