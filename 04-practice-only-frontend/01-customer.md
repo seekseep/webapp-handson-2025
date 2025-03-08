@@ -301,17 +301,17 @@ erDiagram
 import { Link } from 'react-router-dom'
 
 function CustomerCreate () {
+  const [values, setValues] = React.useState({
+    id: '',
+    name: '',
+    email: '',
+    tel: '',
+    address: '',
+  })
+
   const handleSubmit = (event) => {
     event.preventDefault()
-    const data = new FormData(event.target)
-    const customer = {
-      id: data.get('id'),
-      name: data.get('name'),
-      email: data.get('email'),
-      tel: data.get('tel'),
-      address: data.get('address'),
-    }
-    console.log(customer)
+    console.log(values)
   }
   return (
     <div>
@@ -320,28 +320,56 @@ function CustomerCreate () {
         <div>
           <label>
             ID:
-            <input type="text" name="id" />
+            <input
+              type="text" name="id" value={values.id}
+              onChange={event => setValues({
+                ...values,
+                id: event.target.value,
+              })} />
           </label>
         </div>
         <div>
           <label>
-            名前: <input type="text" name="name" />
+            名前:
+            <input
+              type="text" name="name" value={values.name}
+              onChange={event => setValues({
+                ...values,
+                name: event.target.value,
+              })} />
           </label>
         </div>
         <div>
           <label>
-            メールアドレス: <input type="text" name="email" />
+            メールアドレス:
+            <input
+              type="email" name="email" value={values.email}
+              onChange={event => setValues({
+                ...values,
+                email: event.target.value,
+              })} />
           </label>
         </div>
         <div>
           <label>
-            電話番号: <input type="text" name="tel" />
+            電話番号:
+            <input
+              type="tel" name="tel" value={values.tel}
+              onChange={event => setValues({
+                ...values,
+                tel: event.target.value,
+              })} />
           </label>
         </div>
         <div>
           <label>
             住所:
-            <textarea name="address" />
+            <textarea
+              name="address" value={values.address}
+              onChange={event => setValues({
+                ...values,
+                address: event.target.value,
+              })} />
           </label>
         </div>
         <button type="submit">登録</button>
@@ -362,10 +390,12 @@ export default CustomerCreate;
 
 `src/storage.js` を作ります。
 
+`addCustomer` は非同期処理として書きます。これはWebAPIへのアクセスを想定しています。
+
 ```js
 const customers = {}
 
-export function addCustomer (customer) {
+export async function addCustomer (customer) {
   customers[customer.id] = customer
   console.log(customers)
 }
@@ -383,24 +413,24 @@ import { addCustomer } from '../storage'
 
 `addCustomer()`にデータを渡します。
 
+`await` を使って非同期処理を待ちます。
+
 ```js
-  const handleSubmit = (event) => {
-    event.preventDefault()
-    const data = new FormData(event.target)
-    const customer = {
-      id: data.get('id'),
-      name: data.get('name'),
-      email: data.get('email'),
-      tel: data.get('tel'),
-      address: data.get('address'),
-    }
-    addCustomer(customer)
-    event.target.reset()
-    alert('登録しました')
-  }
+const handleSubmit = async (event) => {
+  event.preventDefault()
+  await addCustomer(values)
+  setValues({
+    id: '',
+    name: '',
+    email: '',
+    tel: '',
+    address: '',
+  })
+  alert('登録しました')
+}
 ```
 
-- `event.target.reset()` でフォームをリセットします。
+- `setValues({ ... })` でフォームをリセットします。
 - `alert('登録しました')` で登録完了を知らせます。
 
 # 顧客の一覧
@@ -414,11 +444,11 @@ import { addCustomer } from '../storage'
 ```jsx
 const customers = {}
 
-export function addCustomer (customer) {
+export async function addCustomer (customer) {
   customers[customer.id] = customer
 }
 
-export function getCustomers () {
+export async function getCustomers () {
   return Object.values(customers)
 }
 
@@ -431,10 +461,31 @@ export function getCustomers () {
 `getCustomers` を使ってデータを取得します。
 
 ```jsx
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { getCustomers } from '../storage';
 
 function CustomerCollection () {
+  const [customers, setCustomers] = useState([])
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
+
+  async function load () {
+    setLoading(true)
+    try {
+      const customers = await getCustomers()
+      setCustomers(customers)
+    } catch (error) {
+      setError(error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    load()
+  }, [])
+
   const customers = getCustomers()
   return (
     <div>
@@ -442,6 +493,9 @@ function CustomerCollection () {
       <p>
         <Link to="/new">新規登録</Link>
       </p>
+      {loading && <p>読み込み中...</p>}
+      {error && <p>エラーが発生しました: {error.message}</p>}
+      {customers.length < 1 && <p>顧客が登録されていません</p>}
       <ul>
         {customers.map((customer) => (
           <li key={customer.id}>
@@ -459,9 +513,43 @@ export default CustomerCollection;
 
 ```
 
-この実装にはいくつかの問題がありますが現段階では重要ではないのでこのまま進めます。
+#### 状態管理
 
-登録したデータが一覧で表示されることを確認します。
+取得するデータとエラー、読み込み中かどうかを管理します。
+
+```jsx
+const [customers, setCustomers] = useState([])
+const [error, setError] = useState(null)
+const [loading, setLoading] = useState(false)
+```
+
+### 取得処理
+
+読込中とエラーが発生した場合の処理を追加します。
+
+```js
+async function load () {
+  setLoading(true)
+  try {
+    const customers = await getCustomers()
+    setCustomers(customers)
+  } catch (error) {
+    setError(error)
+  } finally {
+    setLoading(false)
+  }
+}
+```
+
+### 取得処理の実行
+
+画面が読み込まれた時に実行されることを期待して `useEffect` を使います。
+
+```js
+useEffect(() => {
+  load()
+}, [])
+```
 
 # 顧客の閲覧
 
@@ -474,7 +562,7 @@ export default CustomerCollection;
 IDを指定したらそのIDのデータを取得します。
 
 ```jsx
-export function getCustomer (id) {
+export async function getCustomer (id) {
   return customer[id];
 }
 
@@ -490,48 +578,31 @@ import { getCustomer } from "../storage";
 
 function CustomerSingle () {
   const param = useParams();
-  const customer = getCustomer(param.id);
+  const [customer, setCustomer] = useState(null)
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
+
+  async function load (id) {
+    setLoading(true)
+    try {
+      const customer = await getCustomer(id)
+      setCustomer(customer)
+    } catch (error) {
+      setError(error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    load(param.id)
+  }, [param.id])
 
   return (
     <div>
       <h1>顧客単一</h1>
-      <p>ID: {customer.id}</p>
-      <p>名前: {customer.name}</p>
-      <p>メールアドレス: {customer.email}</p>
-      <p>電話番号: {customer.tel}</p>
-      <p>住所: {customer.address}</p>
-      <hr />
-      <Link to="/">顧客一覧に戻る</Link>
-    </div>
-  );
-}
-
-export default CustomerSingle;
-
-```
-
-## 顧客がないとき
-
-現段階では永続化していないので画面を再読込するとデータが見つからなくなります。
-
-そのためエラーが発生します。顧客がない場合はエラーを表示するようにします。
-
-```jsx
-import { Link, useParams } from "react-router-dom";
-import { getCustomer } from "../storage";
-
-function CustomerSingle () {
-  const param = useParams();
-  const customer = getCustomer(param.id);
-
-  return (
-    <div>
-      <h1>顧客単一</h1>
-      {!customer && (
-        <div>
-          <p>顧客が見つかりません</p>
-        </div>
-      )}
+      {error && <p>エラーが発生しました: {error.message}</p>}
+      {loading && <p>読み込み中...</p>}
       {customer && (
         <div>
           <p>ID: {customer.id}</p>
@@ -541,6 +612,7 @@ function CustomerSingle () {
           <p>住所: {customer.address}</p>
         </div>
       )}
+
       <hr />
       <Link to="/">顧客一覧に戻る</Link>
     </div>
@@ -548,8 +620,37 @@ function CustomerSingle () {
 }
 
 export default CustomerSingle;
+
 ```
 
+
+### 取得処理の実行
+
+今までは第2引数はからの配列になっていました。それは結果的にコンポーネントが表示されたタイミングで表示する動作を実現していました。
+
+今回はパスに指定されているパラメータが変更された時に実行されることを期待しているので `param.id` を指定します。
+
+```js
+useEffect(() => {
+  load(param.id)
+}, [param.id])
+```
+
+## 顧客がないとき
+
+現段階では永続化していないので画面を再読込するとデータが見つからなくなります。
+
+顧客がない場合はエラーを投げるようにしましょう。
+
+```js
+export async function getCustomer (id) {
+  const customer = customers[id]
+  if (!customer) throw new Error('顧客が見つかりません')
+  return customer[id];
+}
+```
+
+WebAPIを利用する場合はWebAPIがエラーを返すことが一般的です。
 
 # 顧客の編集
 
@@ -570,17 +671,29 @@ import { getCustomer } from "../storage";
 
 function CustomerSingle () {
   const param = useParams();
-  const customer = getCustomer(param.id);
+
+  const [customer, setCustomer] = useState(null)
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
+
+  async function load (id) {
+    setLoading(true)
+    try {
+      const customer = await getCustomer(id)
+      setCustomer(customer)
+    } catch (error) {
+      setError(error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    load(param.id)
+  }, [param.id])
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    const data = new FormData(event.target);
-    const customer = {
-      id: param.id,
-      name: data.get("name"),
-      email: data.get("email"),
-      tel: data.get("tel"),
-      address: data.get("address"),
-    };
     console.log(customer);
     alert("保存しました");
   }
@@ -588,11 +701,8 @@ function CustomerSingle () {
   return (
     <div>
       <h1>顧客単一</h1>
-      {!customer && (
-        <div>
-          <p>顧客が見つかりません</p>
-        </div>
-      )}
+      {error && <p>エラーが発生しました: {error.message}</p>}
+      {loading && <p>読み込み中...</p>}
       {customer && (
         <form onSubmit={handleSubmit}>
           <div>
@@ -602,23 +712,33 @@ function CustomerSingle () {
           </div>
           <div>
             <label>
-              名前: <input type="text" name="name" defaultValue={customer.name} />
+              名前:
+              <input
+                type="text" name="name" value={customer.name}
+                onChange={event => setValues({ ...customer, name: event.target.value })} />
             </label>
           </div>
           <div>
             <label>
-              メールアドレス: <input type="text" name="email" defaultValue={customer.email} />
+              メールアドレス:
+              <input
+                type="email" name="email" value={customer.email}
+                onChange={event => setValues({ ...customer, email: event.target.value })} />
             </label>
           </div>
           <div>
             <label>
-              電話番号: <input type="text" name="tel" defaultValue={customer.tel} />
+              電話番号:
+              <input
+                type="tel" name="tel" value={customer.tel}
+                onChange={event => setValues({ ...customer, tel: event.target.value })} />
             </label>
           </div>
           <div>
             <label>
               住所:
-              <textarea name="address" defaultValue={customer.address} />
+              <textarea name="address" value={customer.address}
+                onChange={event => setValues({ ...customer, address: event.target.value })} />
             </label>
           </div>
           <button type="submit">保存</button>
@@ -638,8 +758,11 @@ export default CustomerSingle;
 
 `updateCustomer` を追加します。
 
+ここでも存在しない場合はエラーを投げるようにします。
+
 ```js
-export function updateCustomer (customer) {
+export async function updateCustomer (customer) {
+  if (!customers[customer.id]) throw new Error('顧客が見つかりません')
   customers[customer.id] = customer
 }
 
@@ -655,18 +778,20 @@ import { getCustomer, updateCustomer } from "../storage";
 ```
 
 ```js
-  const handleSubmit = (event) => {
+  const [customer, setCustomer] = useState(null)
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.target);
-    const customer = {
-      id: param.id,
-      name: data.get("name"),
-      email: data.get("email"),
-      tel: data.get("tel"),
-      address: data.get("address"),
-    };
-    updateCustomer(customer);
-    alert("保存しました");
+    setLoading(true)
+    try {
+      await updateCustomer(customer);
+      alert("保存しました");
+    } catch (error) {
+      setError(error)
+    } finally {
+      setLoading(false)
+    }
   }
 ```
 
@@ -687,7 +812,8 @@ import { getCustomer, updateCustomer } from "../storage";
 次の２つの処理の結果は同じです。
 
 ```js
-export function deleteCustomer (id) {
+export async function deleteCustomer (id) {
+  if (!customers[id]) throw new Error('顧客が見つかりません')
   delete customers[id]
 }
 
@@ -702,25 +828,27 @@ import { Link, useParams } from "react-router-dom";
 import { deleteCustomer, getCustomer, updateCustomer } from "../storage";
 
 function CustomerSingle () {
-  const param = useParams();
-  const customer = getCustomer(param.id);
-  const handleSubmit = (event) => {
-    /* 省略 */
-  }
+  const [customer, setCustomer] = useState(null)
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
 
-  const handleDelete = () => {
-    alert("削除しました");
-    deleteCustomer(param.id);
+  const handleDelete = async () => {
+    setLoading(true)
+    try {
+      alert("削除しました");
+      await deleteCustomer(param.id);
+    } catch (error) {
+      setError(error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
     <div>
       <h1>顧客単一</h1>
-      {!customer && (
-        <div>
-          <p>顧客が見つかりません</p>
-        </div>
-      )}
+      {error && <p>エラーが発生しました: {error.message}</p>}
+      {loading && <p>読み込み中...</p>}
       {customer && (
         <form onSubmit={handleSubmit}>
           {/* 省略 */}
@@ -739,7 +867,6 @@ export default CustomerSingle;
 ```
 
 ## 動作確認
-
 
 顧客登録後に削除して一覧表示に戻ってください。
 一覧から削除されています。
@@ -763,9 +890,9 @@ function CustomerSingle () {
 削除時に遷移します。
 
 ```js
-const handleDelete = () => {
+const handleDelete = async () => {
+  await deleteCustomer(param.id);
   alert("削除しました");
-  deleteCustomer(param.id);
   navigate("/");
 }
 ```

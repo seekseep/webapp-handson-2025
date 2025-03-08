@@ -119,9 +119,9 @@ function App () {
     address3: ''
   })
 
-  function handleSubmit (e) {
-    e.preventDefault()
-    const data = new FormData(e.target)
+  function handleSubmit (event) {
+    event.preventDefault()
+    const data = new FormData(event.target)
     const zipCode = data.get('zipcode')
 
     setAddress({
@@ -181,9 +181,9 @@ function App () {
     address3: ''
   })
 
-  async function handleSubmit (e) {
-    e.preventDefault()
-    const data = new FormData(e.target)
+  async function handleSubmit (event) {
+    event.preventDefault()
+    const data = new FormData(event.target)
     const zipCode = data.get('zipcode')
     const address = await fetchAddressByZipcode(zipCode)
     setAddress(address)
@@ -257,9 +257,9 @@ function App () {
   })
   const [error, setError] = useState('')
 
-  async function handleSubmit (e) {
-    e.preventDefault()
-    const data = new FormData(e.target)
+  async function handleSubmit (event) {
+    event.preventDefault()
+    const data = new FormData(event.target)
     const zipCode = data.get('zipcode')
 
     if (!/^[0-9]{7}$/.test(zipCode)) {
@@ -281,6 +281,7 @@ function App () {
         </label>
         <button type="submit">検索</button>
       </form>
+      {error && <p>{error}</p>}
       <dl>
         <dt>郵便番号</dt>
         <dd>{address.zipcode}</dd>
@@ -356,13 +357,12 @@ async function fetchAddressByZipcode (zipcode) {
 
 `throw` はエラーを投げます。このエラーは呼び出し側が `try-catch` で囲っている場合 `catch` で受け取ることができます。`throw` が呼び出された後は関数の実行が中断されます。
 
-
 `handleSubmit` を次のように修正します。
 
 ```jsx
-async function handleSubmit (e) {
-      e.preventDefault()
-    const data = new FormData(e.target)
+async function handleSubmit (event) {
+      event.preventDefault()
+    const data = new FormData(event.target)
     const zipCode = data.get('zipcode')
 
     if (!/^[0-9]{7}$/.test(zipCode)) {
@@ -373,27 +373,25 @@ async function handleSubmit (e) {
     try {
       const address = await fetchAddressByZipcode(zipCode)
       setAddress(address)
-    } catch (e) {
-      setError(e.message)
+    } catch (error) {
+      setError(error.message)
     }
 }
 
 ```
 
-
 ```js
     try {
       const address = await fetchAddressByZipcode(zipCode)
       setAddress(address)
-    } catch (e) {
-      setError(e.message)
+    } catch (error) {
+      setError(error.message)
     }
 ```
 
 ## 違う書き方
 
 error を投げる方法に馴染みのない人は次の書き方もできます
-
 
 ```jsx
 async function fetchAddressByZipcode (zipcode) {
@@ -409,22 +407,22 @@ async function fetchAddressByZipcode (zipcode) {
 ```
 
 ```jsx
-async function handleSubmit (e) {
-      e.preventDefault()
-    const data = new FormData(e.target)
-    const zipCode = data.get('zipcode')
+async function handleSubmit (event) {
+  event.preventDefault()
+  const data = new FormData(event.target)
+  const zipCode = data.get('zipcode')
 
-    if (!/^[0-9]{7}$/.test(zipCode)) {
-      setError('郵便番号は7桁の数字で入力してください')
-      return
-    }
+  if (!/^[0-9]{7}$/.test(zipCode)) {
+    setError('郵便番号は7桁の数字で入力してください')
+    return
+  }
 
-    const address = await fetchAddressByZipcode(zipCode)
-    if (address === null) {
-      setError('存在しない郵便番号です')
-      return
-    }
-    setAddress(address)
+  const address = await fetchAddressByZipcode(zipCode)
+  if (address === null) {
+    setError('存在しない郵便番号です')
+    return
+  }
+  setAddress(address)
 }
 ```
 
@@ -473,6 +471,7 @@ function App () {
         </label>
         <button type="submit">検索</button>
       </form>
+      {error && <p>{error}</p>}
       {loading && <p>ローディング中...</p>}
       <dl>
         <dt>郵便番号</dt>
@@ -494,9 +493,9 @@ function App () {
 
 ```js
 
-async function handleSubmit (e) {
-  e.preventDefault()
-  const data = new FormData(e.target)
+async function handleSubmit (event) {
+  event.preventDefault()
+  const data = new FormData(event.target)
   const zipCode = data.get('zipcode')
 
   if (!/^[0-9]{7}$/.test(zipCode)) {
@@ -508,8 +507,8 @@ async function handleSubmit (e) {
   try {
     const address = await fetchAddressByZipcode(zipCode)
     setAddress(address)
-  } catch (e) {
-    setError(e.message)
+  } catch (error) {
+    setError(error.message)
   }
   setLoading(false)
 }
@@ -518,12 +517,186 @@ async function handleSubmit (e) {
 
 これで非同期処理に応じて loading の内容が変更されます。
 
+# 画面表示時に住所を取得する
+
+郵便番号の情報を表示するWebアプリだと考えます。
+
+http://localhost:3000?zipcode=8997103 にアクセスすると郵便番号 `8997103` に対応する住所が表示されるようにしたいです。
+
+今まではフォームで送信された値を取得していましたが、今回はURLのクエリパラメータから取得します。
+
+
+## フォーム実行時に画面遷移する
+
+フォームを送信すると画面が再読込されてURLにパラメータが付いていることを確認してください。
+
+```jsx
+// fetchAddressByZipcode は省略
+
+function App () {
+  const [address, setAddress] = useState({
+    zipcode: '',
+    address1: '',
+    address2: '',
+    address3: ''
+  })
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  return (
+    <div>
+      <h1>住所を表示する</h1>
+      {error && <p>{error}</p>}
+      {loading && <p>ローディング中...</p>}
+      <form action="." method="get">
+        <label>
+          郵便番号
+          <input name="zipcode" />
+        </label>
+        <button type="submit">検索</button>
+      </form>
+      <dl>
+        <dt>郵便番号</dt>
+        <dd>{address.zipcode}</dd>
+        <dt>住所1</dt>
+        <dd>{address.address1}</dd>
+        <dt>住所2</dt>
+        <dd>{address.address2}</dd>
+        <dt>住所3</dt>
+        <dd>{address.address3}</dd>
+      </dl>
+    </div>
+  )
+}
+
+```
+
+## パラメータを取得する
+
+ついているパラメータを取得して入力欄の初期値としましょう。
+
+
+```jsx
+import { useState, useEffect } from 'react'
+
+// fetchAddressByZipcode は省略
+
+function App () {
+  const [address, setAddress] = useState({
+    zipcode: '',
+    address1: '',
+    address2: '',
+    address3: ''
+  })
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const zipcode = new URL(window.location.href).searchParams.get('zipcode') || ''
+  return (
+    <div>
+      <h1>住所を表示する</h1>
+      {error && <p>{error}</p>}
+      {loading && <p>ローディング中...</p>}
+      <form action="." method="get">
+        <label>
+          郵便番号
+          <input name="zipcode" defaultValue={zipcode} />
+        </label>
+        <button type="submit">検索</button>
+      </form>
+      <dl>
+        <dt>郵便番号</dt>
+        <dd>{address.zipcode}</dd>
+        <dt>住所1</dt>
+        <dd>{address.address1}</dd>
+        <dt>住所2</dt>
+        <dd>{address.address2}</dd>
+        <dt>住所3</dt>
+        <dd>{address.address3}</dd>
+      </dl>
+    </div>
+  )
+}
+
+```
+
+## パラメータがある場合に住所を取得する
+
+`useEffect()` が登場しています。
+
+`useEffect` は React の学習を進める中でとても難しい概念です。ここでは `useEffect` がパラメータが変更されたときに実行されるということだけ覚えてください。
+
+```jsx
+import { useState, useEffect } from 'react'
+
+// fetchAddressByZipcode は省略
+
+function App () {
+  const [address, setAddress] = useState({
+    zipcode: '',
+    address1: '',
+    address2: '',
+    address3: ''
+  })
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  async function fetchAddress (zipCode) {
+    setLoading(true)
+    try {
+      const address = await fetchAddressByZipcode(zipCode)
+      setAddress(address)
+    } catch (error) {
+      setError(error.message)
+    }
+    setLoading(false)
+  }
+
+  useEffect(() => {
+    const url = new URL(window.location.href)
+    const zipCode = url.searchParams.get('zipcode')
+    if (!zipCode) return
+    fetchAddress(zipCode)
+  }, [])
+
+  const zipcode = new URL(window.location.href).searchParams.get('zipcode') || ''
+  return (
+    <div>
+      <h1>住所を表示する</h1>
+      {error && <p>{error}</p>}
+      {loading && <p>ローディング中...</p>}
+      <form action="." method="get">
+        <label>
+          郵便番号
+          <input name="zipcode" defaultValue={zipcode} />
+        </label>
+        <button type="submit">検索</button>
+      </form>
+      <dl>
+        <dt>郵便番号</dt>
+        <dd>{address.zipcode}</dd>
+        <dt>住所1</dt>
+        <dd>{address.address1}</dd>
+        <dt>住所2</dt>
+        <dd>{address.address2}</dd>
+        <dt>住所3</dt>
+        <dd>{address.address3}</dd>
+      </dl>
+    </div>
+  )
+}
+
+```
+
+useEffectはコンポーネントのライフサイクルに応じて処理を行うためのフックです。
+
+第一引数には関数を渡します。この関数はコンポーネントがマウントされたとき、アンマウントされたとき、更新されたときに実行されます。
+
+
 # 理解を深める
 
 1. `address` が取得されていないときは `<dl>` の中を表示しないようにしましょう
-2. ローディング中にフォームがsubmitされたときは処理を行わないようにしましょう
-3. ローディング中に input と button を disabled にしましょう
-
+2. ローディング中に input と button を disabled にしましょう
 
 # まとめ
 
@@ -541,6 +714,8 @@ graph LR
 ```
 
 これで非同期処理を実行できるようになりました。
+
+フォームを送信したときと画面を表示した時それぞれで非同期処理をする方法を学びました。
 
 次の節では画面遷移を学んでいきます。
 

@@ -74,3 +74,43 @@ graph LR
   TeamSingle --> EmployeeSingle[社員単一画面]
   TeamSingle --> EmployeeNew[社員単一画面]
 ```
+
+# Web API を使わずに localStorage を使う
+
+本来は Web API を使ってデータの永続化を行いますが、この章では localStorage を使ってデータの永続化を行います。
+
+```mermaid
+---
+title: 本来の形
+---
+
+graph LR
+  subgraph ブラウザ
+    Client[クライアント]
+  end
+
+  subgraph サーバー
+    WebAPI[WebAPI]
+    Database[データベース]
+  end
+
+  Client -->|非同期処理| WebAPI
+  WebAPI --> Database
+
+```
+
+```mermaid
+---
+title: この章の形
+---
+
+graph LR
+  subgraph ブラウザ
+    direction LR
+    Client[クライアント]
+    localStorage[localStorage]
+  end
+  Client -->|非同期処理| localStorage
+```
+
+localStorage へのアクセスは同期処理で行えますが、　**WebAPIに置き換えられるように非同期処理で行います。**

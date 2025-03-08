@@ -105,8 +105,8 @@ function App () {
     age: ''
   })
 
-  function handleChange (e) {
-    const data = new FormData(e.target.form)
+  function handleChange (event) {
+    const data = new FormData(event.target.form)
     const name = data.get('name')
     const age = data.get('age')
 

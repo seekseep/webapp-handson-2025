@@ -1,57 +1,47 @@
-# フォームの作成
+# フォーム
 
-アプリケーションではユーザーが入力した内容を反映する機能が必要なことが多いです。
+ユーザー情報を送信するフォームを考えます。
 
-ログインやプロフィールの変更など普段からもさまざまな場面でフォームを使うことがあります。
+# HTMLの機能を中心にフォームを作る
 
-ここでは　React を使ってフォームを作成する方法を学びます。
+## 基本的なフォームの形
 
-# フォームの作成
+HTMLには `<form>` を始めとするフォームを作成するための要素が用意されています。
 
-App コンポーネントにフォームを追加します。
-
-`src/App.jsx` を次のように編集します。
-
-```jsx
+``` jsx
 function App () {
   return (
     <form>
       <label>
-        名前
-        <input type="text" />
+        名前:
+        <input type="text" name="name" />
       </label>
       <button type="submit">送信</button>
     </form>
   )
 }
-
 ```
 
-ボタンを押すとページがリロードされます。
+## フォーム送信時の処理
 
-これはHTMLのデフォルトの挙動です。従来のWebアプリケーションではフォームの内容をサーバーに送信するためにリクエストを送っていました。
+これで送信するとアラートが表示されます。
 
-次のように書くことで submit.php に対してフォームの内容を送信することができます。
+しかし、その後に画面が再読込されていることを確認してください。
 
-```
-<form action="/submit.php" method="post">
-```
+また、submit は input にカーソルがある状態でエンターキーを押しても送信されます。
 
-# ページの再読み込みををとめる
-
-次のように書いてみましょう。
-
-```jsx
+``` jsx
 function App () {
-  function handleSubmit (e) {
-    e.preventDefault()
+
+  function handleSubmit (event) {
+    window.alert('送信されました')
   }
 
   return (
     <form onSubmit={handleSubmit}>
       <label>
-        名前
-        <input type="text" />
+        名前:
+        <input type="text" name="name" />
       </label>
       <button type="submit">送信</button>
     </form>
@@ -59,44 +49,26 @@ function App () {
 }
 ```
 
-先程のおさらいになりますが、form 要素に onSubmit イベントを追加しています。
+## 値の取得
 
-フォームが送信されると handleSubmit 関数が呼ばれます。
+送信時に値を取得してみましょう。
 
-`e.preventDefault()` はデフォルトの挙動をキャンセルするメソッドです。そのため、ページがリロードされることがなくなります。
+`new FormData(formElement)` でフォームの値を取得できます。
 
-## submitイベントの発火の条件
-
-ボタンをクリックするとsubmitイベントが発火します。
-
-それ以外に submitイベントを発火させる方法があります。
-どのようにしたら submit イベントを発火させることができるでしょうか？
-
-# フォームの内容を表示する
-
-送信された内容を画面に表示するようにしましょう。
-
-フォームを使って次のような画面を作ってみましょう。
-
-1. ユーザーは名前を入力する
-2. 送信ボタンを押す
-3. 画面に「こんにちは、〇〇さん」と表示される
-
-`src/App.jsx` を次のように編集します。
+フォーム内の `name` 属性をキーとして値を取得できます。
 
 ```jsx
 function App () {
-  function handleSubmit (e) {
-    e.preventDefault()
-    const data = new FormData(e.target)
+  function handleSubmit (event) {
+    const data = new FormData(event.target)
     const name = data.get('name')
-    alert("こんにちは、" + name + "さん")
+    window.alert(`${name}さん`)
   }
 
   return (
     <form onSubmit={handleSubmit}>
       <label>
-        名前
+        名前:
         <input type="text" name="name" />
       </label>
       <button type="submit">送信</button>
@@ -106,41 +78,28 @@ function App () {
 
 ```
 
-## FormData オブジェクト
+## イベントのキャンセル
 
-`FormData` オブジェクトはフォームのデータを扱うためのオブジェクトです。
+今のままでは画面が再読込されているので次のコードを追加して再読み込みをやめる。
 
-`new FormData(e.target)` でフォームのデータを取得することができます。ここで `e.target` はイベントが発生した要素を指します。つまり、`<form>` 要素です。
+`event.preventDefault()` はイベントのデフォルトの動作をキャンセルするメソッドです。
 
-`data.get('name')` でフォームの name 属性が `name` の値を取得することができます。
-
-そのため、`name` という名前の input 要素に入力された値を取得することができます。
-
-## 年齢を追加する
-
-フォームが送信された後に `田中太郎さん(23)` のように年齢が表示されるように実装してみましょう。
-
-### 実装例
+フォームの送信時のデフォルトのイベントは画面遷移です。現在は遷移先を指定していないので、再読み込みが行われます。
 
 ```jsx
 function App () {
-  function handleSubmit (e) {
-    e.preventDefault()
-    const data = new FormData(e.target)
+  function handleSubmit (event) {
+    event.preventDefault()
+    const data = new FormData(event.target)
     const name = data.get('name')
-    const age = data.get('age')
-    alert(name + "さん(" + age + ")")
+    window.alert(`${name}さん`)
   }
 
   return (
     <form onSubmit={handleSubmit}>
       <label>
-        名前
+        名前:
         <input type="text" name="name" />
-      </label>
-      <label>
-        年齢
-        <input type="number" name="age" />
       </label>
       <button type="submit">送信</button>
     </form>
@@ -149,105 +108,204 @@ function App () {
 
 ```
 
-`<input type="number" name="age" />` で数値を入力するためのフォームを追加しました。
+## 値の追加
 
-# 不正な動き
-
-このままでは名前と年齢を入力しなくても送信ボタンを押すことができてしまいます。
-
-実際に試してみてください。
-
-## required 属性
-
-`<input>` 要素に `required` 属性を追加することで入力必須にすることができます。
-
-`required` 属性はフォームを `submit` する際に入力が必須であることを示します。
+値を追加してみましょう。
 
 ```jsx
+
 function App () {
-  function handleSubmit (e) {
-    e.preventDefault()
-    const data = new FormData(e.target)
+  function handleSubmit (event) {
+    event.preventDefault()
+    const data = new FormData(event.target)
     const name = data.get('name')
     const age = data.get('age')
-
-    alert(name + "さん(" + age + ")")
+    const email = data.get('email')
+    window.alert(`${name}さんは${age}歳です。メールアドレスは${email}です`)
   }
 
   return (
     <form onSubmit={handleSubmit}>
       <label>
-        名前
+        名前:
+        <input type="text" name="name" />
+      </label>
+      <label>
+        年齢:
+        <input type="text" name="age" />
+      </label>
+      <label>
+        メールアドレス:
+        <input type="text" name="email" />
+      </label>
+      <button type="submit">送信</button>
+    </form>
+  )
+}
+```
+
+これでは内容が空白でも送信できてしまうので、バリデーションを追加します。
+
+## 初期値の設定
+
+`defaultValue` 属性を追加することで初期値を設定できます。
+
+```jsx
+function App () {
+  function handleSubmit (event) {
+    event.preventDefault()
+    const data = new FormData(event.target)
+    const name = data.get('name')
+    const age = data.get('age')
+    const email = data.get('email')
+    window.alert(`${name}さんは${age}歳です。メールアドレスは${email}です`)
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>
+        名前:
+        <input type="text" name="name" />
+      </label>
+      <label>
+        年齢:
+        <input type="text" name="age" defaultValue="20" />
+      </label>
+      <label>
+        メールアドレス:
+        <input type="text" name="email" />
+      </label>
+      <button type="submit">送信</button>
+    </form>
+  )
+}
+
+```
+
+## バリデーション
+
+`required` 属性を追加することで必須項目にすることができます。
+
+```jsx
+function App () {
+  function handleSubmit (event) {
+    event.preventDefault()
+    const data = new FormData(event.target)
+    const name = data.get('name')
+    const age = data.get('age')
+    const email = data.get('email')
+    window.alert(`${name}さんは${age}歳です。メールアドレスは${email}です`)
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>
+        名前:
         <input type="text" name="name" required />
       </label>
       <label>
-        年齢
-        <input type="number" name="age" required />
+        年齢:
+        <input type="text" name="age" defaultValue="20" required />
+      </label>
+      <label>
+        メールアドレス:
+        <input type="text" name="email" required />
       </label>
       <button type="submit">送信</button>
     </form>
   )
 }
-
 ```
 
-この方法でも不正な動きを防ぐことができます。
+この状態でも次のような問題が残っています。
 
-# 入力中に不正な値であることを表示する
+- 年齢に数値以外を入力できる
+- 名前に文字を大量に入力できる
+- 多大くないメールアドレスを入力できる
 
-## 入力中に表示を変える
+### その他のバリデーション
 
-まずは入力中に表示を変える方法を学びましょう。
+次のコードでは次のバリデーションを追加しています。
 
-入力しながらパスワードに記号が含まれていないと表示されるようなフォームを見たことがあると思います。この場合は、入力中にパスワードの強度を表示しています。
-
-そのように入力内容に応じて表示を変える方法を考えてみましょう。
-
-まずは入力されている内容をそのまま画面に表示してみましょう。
+- 名前は入力必須、20文字以内
+- 年齢は入力必須、0以上200以下
+- メールアドレスは入力必須、メールアドレス形式
 
 ```jsx
 function App () {
-  const [values, setValues] = React.useState({
-    name: '',
-    age: ''
-  })
-
-  function handleChange (e) {
-    const data = new FormData(e.target.form)
+  function handleSubmit (event) {
+    event.preventDefault()
+    const data = new FormData(event.target)
     const name = data.get('name')
     const age = data.get('age')
-    setValues({
-      name: name,
-      age: age
-    })
-  }
-
-  function handleSubmit (e) {
-    const data = new FormData(e.target)
-    const name = data.get('name')
-    const age = data.get('age')
-    alert(`${data.name}さん(${data.age})`)
+    const email = data.get('email')
+    window.alert(`${name}さんは${age}歳です`)
   }
 
   return (
-    <form
-      onChange={handleChange}
-      onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit}>
       <label>
-        名前
-        <input
-          type="text" name="name" />
+        名前:
+        <input type="text" name="name" required maxLength="20" />
       </label>
       <label>
-        年齢
-        <input
-          type="number" name="age" />
+        年齢:
+        <input type="number" name="age" defaultValue="20" required min="0" max="200" />
       </label>
-      <div>
-        <p>入力中の内容</p>
-        <p>名前: {values.name}</p>
-        <p>年齢: {values.age}</p>
-      </div>
+      <label>
+        メールアドレス:
+        <input type="email" name="email" required />
+      </label>
+      <button type="submit">送信</button>
+    </form>
+  )
+}
+```
+
+他にもバリデーションの方法はいくつかある。
+
+[クライアント側のフォーム検証](https://developer.mozilla.org/ja/docs/Learn/Forms/Form_validation) について詳しく知りたい場合はこちらを参照してください。
+
+
+## HTMLの機能について
+
+ここまで見てきたようにHTMLのAPIは非常に強力で、フォームの作成には十分な機能が揃っている。
+
+しかし、これでは実現したい値が複雑な場合には対応できない場合がある。
+
+その場合は useState を使ってフォームの値を管理する方法を考える。
+
+# Reactの機能を使ってフォームを作る
+
+## 入力中の値を表示したい
+
+入力中の表示をするためには、useStateを使ってフォームの値を管理する。
+
+```jsx
+import { useState } from 'react'
+
+function App () {
+  const [name, setName] = useState('')
+
+  function handleChange (event) {
+    setName(event.target.value)
+  }
+
+  function handleSubmit (event) {
+    event.preventDefault()
+    window.alert(`${name}さん`)
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>
+        名前:
+        <input type="text" name="name" value={name} onChange={handleChange} />
+      </label>
+      <dl>
+        <dt>入力中の名前</dt>
+        <dd>{name}</dd>
+      </dl>
       <button type="submit">送信</button>
     </form>
   )
@@ -255,209 +313,256 @@ function App () {
 
 ```
 
-入力欄に値を入力してから、フォーカスを外してください。
+## 入力欄のヒントを出す
 
-入力中の内容が表示されることが確認できると思います。
-
-
-## 問題がある入力欄の表示を変える
-
-入力が正しくない場合にその旨を表示するようにしましょう。
+名前が短すぎる場合にはエラーメッセージを表示する
 
 ```jsx
+import { useState } from 'react'
+
 function App () {
-  const [errors, setErrors] = React.useState({
-    name: '',
-    age: ''
-  })
-  const [values, setValues] = React.useState({
-    name: '',
-    age: ''
-  })
+  const [name, setName] = useState('')
 
-  function handleChange (e) {
-    const data = new FormData(e.target.form)
-    const name = data.get('name')
-    const age = data.get('age')
+  function handleChange (event) {
+    setName(event.target.value)
+  }
 
-    const values = {
-      name: name,
-      age: age
-    }
+  function handleSubmit (event) {
+    event.preventDefault()
+    window.alert(`${name}さん`)
+  }
 
-    const errors = {
-      name: '',
-      age: ''
-    }
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>
+        名前:
+        <input type="text" name="name" value={name} onChange={handleChange} />
+      </label>
+      {name.length < 3 && <p>短すぎる</p>}
+      {3 <= name.length && name.length <= 10  && <p>適切な長さ</p>}
+      {name.length > 10 && <p>長過ぎる</p>}
+      <button type="submit">送信</button>
+    </form>
+  )
+}
 
-    if (values.name === '') {
-      errors.name = '名前を入力してください'
-    }
+```
 
-    if (values.age === '') {
-      errors.age = '年齢を入力してください'
-    }
+## 送信ボタンを無効にする
 
-    setValues(values)
-    setErrors(errors)
+条件に応じて送信ボタンを無効にする
+
+```jsx
+import { useState } from 'react'
+
+function App () {
+  const [name, setName] = useState('')
+
+  function handleChange (event) {
+    setName(event.target.value)
+  }
+
+  function handleSubmit (event) {
+    event.preventDefault()
+    window.alert(`${name}さん`)
+  }
+
+  const isTooShort = name.length < 3
+  const isTooLong = name.length > 10
+  const isValid = !isTooShort && !isTooLong
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <label>
+        名前:
+        <input type="text" name="name" value={name} onChange={handleChange} />
+      </label>
+      {isTooShort && <p>短すぎる</p>}
+      {isValid  && <p>適切な長さ</p>}
+      {isTooLong && <p>長過ぎる</p>}
+      <button type="submit" disabled={!isValid}>
+        {isValid ? '送信' : '入力してください'}
+      </button>
+    </form>
+  )
+}
+
+```
+
+## 入力欄ごとにエラーを表示する
+
+```jsx
+import { useState } from 'react'
+
+function App () {
+  const [name, setName] = useState('')
+  const [age, setAge] = useState('')
+
+  function handleChangeName (event) {
+    setName(event.target.value)
+  }
+
+  function handleChangeAge (event) {
+    setAge(event.target.value)
+  }
+
+  function handleSubmit (event) {
+    event.preventDefault()
+    window.alert(`${name}さんは${age}歳です`)
   }
 
   let nameError = null
-  if (errors.name) {
-    nameError = <p>{errors.name}</p>
+  if (name.length < 3) {
+    nameError = '短すぎる'
+  } else if (name.length > 10) {
+    nameError = '長過ぎる'
   }
 
   let ageError = null
-  if (errors.age) {
-    ageError = <p>{errors.age}</p>
+  if (age < 0 || age > 200) {
+    ageError = '不正な値'
   }
 
+  const isValid = !nameError && !ageError
+
   return (
-    <form onChange={handleChange}>
+    <form onSubmit={handleSubmit}>
       <label>
-        名前
-        <input type="text" name="name" />
+        名前:
+        <input type="text" name="name" value={name} onChange={handleChangeName} />
+        {nameError && <p>{nameError}</p>}
       </label>
-      {nameError}
       <label>
-        年齢
-        <input type="number" name="age" />
+        年齢:
+        <input type="number" name="age" value={age} onChange={handleChangeAge} />
+        {ageError && <p>{ageError}</p>}
       </label>
-      {ageError}
-      <div>
-        <p>入力中の内容</p>
-        <p>名前: {name}</p>
-        <p>年齢: {age}</p>
-        <p>{error}</p>
-      </div>
-      <button type="submit">送信</button>
+      <button type="submit" disabled={!isValid}>
+        {!isValid ? '入力してください' : '送信'}
+      </button>
     </form>
   )
 }
 
 ```
 
-一度値を入力してからフォーカスを外してください。
-その時はエラーが表示されません。
+## リファクタリング
 
-次の入力した値を削除してからフォーカスを外してください。
-その時はエラーが表示されることが確認できると思います。
-
-## エラーの表示方法
-
-前のエラーの表示方法では次のように表示していました。
+- バリデーション関数を作成する
+- 値を一つのオブジェクトにまとめる
 
 ```jsx
-let nameError = null
-if (errors.name) {
-  nameError = <p>{errors.name}</p>
+import { useState } from 'react'
+
+function validateName (name) {
+  if (name.length < 3) {
+    return '短すぎる'
+  } else if (name.length > 10) {
+    return '長過ぎる'
+  }
+  return null
 }
 
-return (
-  {nameError}
-)
-```
+function validateAge (age) {
+  if (age < 0 || age > 200) {
+    return '不正な値'
+  }
+  return null
+}
 
-こうすることでエラーがあるときだけ表示できます。
-
-これは次のようにも書き換えることができます。
-
-```jsx
-const nameError = errors.name ? <p>{errors.name}</p> : false
-
-return (
-  {nameError}
-)
-```
-
-React では `false` や `null` などを返すとその要素は表示されません。
-
-更に次のようにも書き換えることができます。
-
-```jsx
-
-return (
-  {errors.name && <p>{errors.name}</p>}
-)
-```
-
-ここでみた３つの書き方は同じ意味です。
-
-Reactを使った開発ではHTMLをどのように表示するのかに対して関心が強いです。
-
-HTMLの構造が視覚的にわかりやすいように書くことができるというメリットがあります。好みの問題ではありますが、一般的には次のように書くことが多いです。
-
-```jsx
 function App () {
-  const [errors, setErrors] = React.useState({
+  const [values, setValues] = useState({
     name: '',
     age: ''
   })
 
-  function handleChange (e) {
-    const data = new FormData(e.target.form)
-    const name = data.get('name')
-    const age = data.get('age')
-
-    const errors = {
-      name: '',
-      age: ''
-    }
-
-    if (name === '') {
-      errors.name = '名前を入力してください'
-    }
-
-    if (age === '') {
-      errors.age = '年齢を入力してください'
-    }
-
-    setErrors(errors)
+  function handleChangeName (event) {
+    // const nextValues ={
+    //   age: values.age,
+    //   name: values.name
+    // }
+    // neztValue.name = event.target.value
+    setValues({
+      ...values,
+      name: event.target.value
+    })
   }
 
+  function handleChangeAge (event) {
+    setValues({
+      ...values,
+      age: event.target.value
+    })
+  }
+
+  function handleSubmit (event) {
+    event.preventDefault()
+    window.alert(`${values.name}さんは${values.age}歳です`)
+  }
+
+  const nameError = validateName(name)
+  const ageError = validateAge(age)
+  const isValid = !nameError && !ageError
+
   return (
-    <form onChange={handleChange}>
+    <form onSubmit={handleSubmit}>
       <label>
-        名前
-        <input type="text" name="name" />
+        名前:
+        <input type="text" name="name" value={values.name} onChange={handleChangeName} />
+        {nameError && <p>{nameError}</p>}
       </label>
-      {errors.name && <p>{errors.name}</p>}
       <label>
-        年齢
-        <input type="number" name="age" />
+        年齢:
+        <input type="number" name="age" value={values.age} onChange={handleChangeAge} />
+        {ageError && <p>{ageError}</p>}
       </label>
-      {errors.age && <p>{errors.age}</p>}
-      <button type="submit">送信</button>
+      <button type="submit" disabled={!isValid}>
+        {!isValid ? '入力してください' : '送信'}
+      </button>
     </form>
   )
 }
 
 ```
 
-# 理解の確認
 
-フォームを次のように変えてください。
+### 初期値
 
-## 基本的な課題
+次の箇所で初期値を設定できます。
 
-1. 入力が必須なメールアドレスの入力欄を追加してください。
-2. 年齢は0から200までの数値であることを確認してください。
-3. 自己紹介を `<textarea>` 要素を使って入力できるようにしてください。
+```js
+  const [values, setValues] = useState({
+    name: '',
+    age: ''
+  })
+```
 
-## 応用的な課題
+# 比較
 
-1. メールアドレスの値に `@` が含まれていない場合はエラーを表示してください。
-2. 一つでもエラーがある場合は送信ボタンを押せなくしてください。
+HTMLの機能を使ったフォームの実装はコード量も少なく実装も簡単でした。しかし、自由度は低くなってしまいます。
 
+郵便番号を下に住所を特定するような処理はHTMLの標準の機能では実現できません。
+
+それに対して React の機能を使ったフォームの実装は自由度が高く、複雑な処理も実現できます。コード量が増えてしまうことは難点です。
+
+# 一般的なプロジェクト
+
+一般的なプロジェクトではこれらの煩雑な処理をライブラリを使って簡単に実装することができます。
+
+有名なライブラリには次のようなものがあります。
+
+- [Formik](https://formik.org/)
+- [React Hook Form](https://react-hook-form.com/jp/)
+
+この他にもいくつかありますが、これらのライブラリを使うことでフォームの実装を簡単にすることができます。
 
 # まとめ
 
-前の節で学んだ状態管理を使いながらフォームの実装を学びました。
+フォームを作成するときには次の要素が重要になります。
 
-フォームの場合は入力と送信という２つのイベントがあります。
+- 入力欄の値を管理する
+- バリデーション
+- 初期値を指定する
+- 送信(Submit)時の処理
 
-また、エラーと値も管理してきました。エラーではユーザーが入力した内容から表示する内容を作成しました。
-
-次の節では非同期処理を学びます。
-
-- [非同期処理](./04-async.md)
+要件ごとに実装方法は変わりますが、Reactの機能を使うことで柔軟に対応できることがわかりました。
