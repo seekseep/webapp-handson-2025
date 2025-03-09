@@ -38,14 +38,14 @@ erDiagram
 ```mermaid
 graph LR
   A[顧客一覧] --> B[顧客詳細]
-  A --> C[顧客登録]
+  A --> C[顧客作成]
 ```
 
 | 画面名 | 説明 |
 | --- | --- |
 | 顧客一覧 | 顧客の一覧を表示する |
 | 顧客詳細 | 顧客の詳細を表示し、編集と削除を行う |
-| 顧客登録 | 顧客を登録する |
+| 顧客作成 | 顧客を作成する |
 
 # 機能を考える
 
@@ -53,7 +53,7 @@ graph LR
 | --- | --- |
 | 顧客一覧表示 | 顧客の一覧を表示する |
 | 顧客詳細表示 | 顧客の詳細を表示する |
-| 顧客登録 | 顧客を登録する |
+| 顧客作成 | 顧客を作成する |
 | 顧客編集 | 顧客を編集する |
 | 顧客削除 | 顧客を削除する |
 
@@ -119,7 +119,7 @@ createRoot(document.getElementById('root')).render(
 | --- | --- | --- |
 | `/` | `CustomerCollection` | 顧客一覧 |
 | `/:id` | `CustomerSingle` | 顧客詳細 |
-| `/new` | `CustomerCreate` | 顧客登録 |
+| `/new` | `CustomerCreate` | 顧客作成 |
 
 ```jsx
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
@@ -179,7 +179,7 @@ export default CustomerSingle;
 function CustomerCreate () {
   return (
     <div>
-      <h1>顧客登録</h1>
+      <h1>顧客作成</h1>
     </div>
   );
 }
@@ -198,7 +198,7 @@ export default CustomerCreate;
 | --- | --- |
 | `http://localhost:3000/` | 顧客一覧 |
 | `http://localhost:3000/1` | 顧客詳細 |
-| `http://localhost:3000/new` | 顧客登録 |
+| `http://localhost:3000/new` | 顧客作成 |
 
 # 各画面の遷移
 
@@ -207,7 +207,7 @@ export default CustomerCreate;
 ```mermaid
 graph LR
   A[顧客一覧] --> B[顧客詳細]
-  A --> C[顧客登録]
+  A --> C[顧客作成]
 ```
 
 ## `src/routes/CustomerCollection.jsx`
@@ -220,11 +220,11 @@ function CustomerCollection () {
     <div>
       <h1>顧客一覧</h1>
       <p>
-        <Link to="/new">新規登録</Link>
+        <Link to="/new">新規作成</Link>
       </p>
       <ul>
         <li>
-          <Link to="/1">山田太郎</Link>
+          <Link to="/customer-1">山田太郎</Link>
         </li>
       </ul>
     </div>
@@ -262,7 +262,7 @@ import { Link } from 'react-router-dom'
 function CustomerCreate () {
   return (
     <div>
-      <h1>顧客登録</h1>
+      <h1>顧客作成</h1>
       <hr />
       <Link to="/">顧客一覧に戻る</Link>
     </div>
@@ -273,9 +273,9 @@ export default CustomerCreate;
 
 ```
 
-# 顧客の登録機能
+# 顧客の作成機能
 
-顧客の登録機能を作りましょう。
+顧客の作成機能を作りましょう。
 
 ```mermaid
 erDiagram
@@ -293,7 +293,7 @@ erDiagram
 
 ## フォームの作成
 
-顧客登録画面にフォームを追加します。
+顧客作成画面にフォームを追加します。
 
 `src/routes/CustomerCreate.jsx`
 
@@ -302,7 +302,6 @@ import { Link } from 'react-router-dom'
 
 function CustomerCreate () {
   const [values, setValues] = React.useState({
-    id: '',
     name: '',
     email: '',
     tel: '',
@@ -315,19 +314,8 @@ function CustomerCreate () {
   }
   return (
     <div>
-      <h1>顧客登録</h1>
+      <h1>顧客作成</h1>
       <form onSubmit={handleSubmit}>
-        <div>
-          <label>
-            ID:
-            <input
-              type="text" name="id" value={values.id}
-              onChange={event => setValues({
-                ...values,
-                id: event.target.value,
-              })} />
-          </label>
-        </div>
         <div>
           <label>
             名前:
@@ -372,7 +360,7 @@ function CustomerCreate () {
               })} />
           </label>
         </div>
-        <button type="submit">登録</button>
+        <button type="submit">作成</button>
       </form>
       <hr />
       <Link to="/">顧客一覧に戻る</Link>
@@ -384,19 +372,27 @@ export default CustomerCreate;
 
 ```
 
-## 顧客の登録
+## 顧客の作成
 
 ### `src/storage.js`
 
 `src/storage.js` を作ります。
 
-`addCustomer` は非同期処理として書きます。これはWebAPIへのアクセスを想定しています。
+`createCustomer` は非同期処理として書きます。これはWebAPIへのアクセスを想定しています。
+
+`createCustomerId` は現在のタイムスタンプに対して `customer-` をつけておく。
 
 ```js
 const customers = {}
 
-export async function addCustomer (customer) {
-  customers[customer.id] = customer
+function createCustomerId () {
+  const now = new Date()
+  const time = now.getTime()
+  return `customer-${time}`
+}
+
+export async function createCustomer (customer) {
+  customers[customer.id] = createCustomerId()
   console.log(customers)
 }
 
@@ -404,38 +400,37 @@ export async function addCustomer (customer) {
 
 ### `src/routes/CustomerCreate.jsx`
 
-`src/storage.js` を使ってデータを登録します。
+`src/storage.js` を使ってデータを作成します。
 
 ```jsx
 import { Link } from 'react-router-dom'
-import { addCustomer } from '../storage'
+import { createCustomer } from '../storage'
 ```
 
-`addCustomer()`にデータを渡します。
+`createCustomer()`にデータを渡します。
 
 `await` を使って非同期処理を待ちます。
 
 ```js
 const handleSubmit = async (event) => {
   event.preventDefault()
-  await addCustomer(values)
+  await createCustomer(values)
   setValues({
-    id: '',
     name: '',
     email: '',
     tel: '',
     address: '',
   })
-  alert('登録しました')
+  alert('作成しました')
 }
 ```
 
 - `setValues({ ... })` でフォームをリセットします。
-- `alert('登録しました')` で登録完了を知らせます。
+- `alert('作成しました')` で作成完了を知らせます。
 
 # 顧客の一覧
 
-登録したデータを一覧で見る機能を作ります。
+作成したデータを一覧で見る機能を作ります。
 
 ### 顧客一覧の取得
 
@@ -444,8 +439,15 @@ const handleSubmit = async (event) => {
 ```jsx
 const customers = {}
 
-export async function addCustomer (customer) {
-  customers[customer.id] = customer
+function createCustomerId () {
+  const now = new Date()
+  const time = now.getTime()
+  return `customer-${time}`
+}
+
+export async function createCustomer (customer) {
+  customers[customer.id] = createCustomerId()
+  console.log(customers)
 }
 
 export async function getCustomers () {
@@ -491,11 +493,11 @@ function CustomerCollection () {
     <div>
       <h1>顧客一覧</h1>
       <p>
-        <Link to="/new">新規登録</Link>
+        <Link to="/new">新規作成</Link>
       </p>
       {loading && <p>読み込み中...</p>}
       {error && <p>エラーが発生しました: {error.message}</p>}
-      {customers.length < 1 && <p>顧客が登録されていません</p>}
+      {customers.length < 1 && <p>顧客が作成されていません</p>}
       <ul>
         {customers.map((customer) => (
           <li key={customer.id}>
@@ -553,7 +555,7 @@ useEffect(() => {
 
 # 顧客の閲覧
 
-登録したデータを詳細で見る機能を作ります。
+作成したデータを詳細で見る機能を作ります。
 
 ## 顧客の取得
 
@@ -653,14 +655,14 @@ WebAPIを利用する場合はWebAPIがエラーを返すことが一般的で�
 
 # 顧客の編集
 
-登録したデータを編集する機能を作ります。
+作成したデータを編集する機能を作ります。
 
 ここでは画面を増やさずにこの画面で編集できるようにします。
 
 ## フォームの作成
 
 まずはフォームだけを表示します。
-まだ保存処理は書いていません。
+まだ変更処理は書いていません。
 
 ID は変更できないようにします。
 
@@ -694,7 +696,7 @@ function CustomerSingle () {
   const handleSubmit = (event) => {
     event.preventDefault();
     console.log(customer);
-    alert("保存しました");
+    alert("変更しました");
   }
 
   return (
@@ -704,11 +706,6 @@ function CustomerSingle () {
       {loading && <p>読み込み中...</p>}
       {customer && (
         <form onSubmit={handleSubmit}>
-          <div>
-            <label>
-              ID: {customer.id}
-            </label>
-          </div>
           <div>
             <label>
               名前:
@@ -740,7 +737,7 @@ function CustomerSingle () {
                 onChange={event => setCustomer({ ...customer, address: event.target.value })} />
             </label>
           </div>
-          <button type="submit">保存</button>
+          <button type="submit">変更</button>
         </form>
       )}
       <hr />
@@ -785,7 +782,7 @@ import { getCustomer, updateCustomer } from "../storage";
     setLoading(true)
     try {
       await updateCustomer(customer);
-      alert("保存しました");
+      alert("変更しました");
     } catch (error) {
       setError(error)
     } finally {
@@ -802,7 +799,7 @@ import { getCustomer, updateCustomer } from "../storage";
 
 # 顧客の削除
 
-登録したデータを削除する機能を作ります。
+作成したデータを削除する機能を作ります。
 
 ## 顧客の削除
 
@@ -851,7 +848,7 @@ function CustomerSingle () {
       {customer && (
         <form onSubmit={handleSubmit}>
           {/* 省略 */}
-          <button type="submit">保存</button>
+          <button type="submit">変更</button>
           <button type="button" onClick={handleDelete}>削除</button>
         </form>
       )}
@@ -867,7 +864,7 @@ export default CustomerSingle;
 
 ## 動作確認
 
-顧客登録後に削除して一覧表示に戻ってください。
+顧客作成後に削除して一覧表示に戻ってください。
 一覧から削除されています。
 
 ## 削除時に画面遷移
@@ -923,10 +920,10 @@ export function load() {
 
 ## データの書き込み時に保存
 
-`addCustomer`, `updateCustomer`, `deleteCustomer` で保存処理を呼び出します。
+`createCustomer`, `updateCustomer`, `deleteCustomer` で保存処理を呼び出します。
 
 ```js
-export function addCustomer (customer) {
+export function createCustomer (customer) {
   customers[customer.id] = customer
   save()
 }

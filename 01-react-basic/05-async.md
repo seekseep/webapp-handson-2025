@@ -126,7 +126,7 @@ function App () {
 
     setAddress({
       zipcode: zipCode,
-      address1: '鹿児島県'
+      address1: '鹿児島県',
       address2: '志布志市',
       address3: '志布志町志布志'
     })
