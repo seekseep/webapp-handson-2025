@@ -4,13 +4,74 @@ Webで非同期処理が出てきたのは、Ajaxが登場してからです。A
 
 Google Map は世界中の地図を様々な縮尺で表示することができます。ただし、その地図データをすべてダウンロードするとなると大きなデータになることが想像できます。
 
+```mermaid
+graph RL
+  Browser[ブラウザ]
+  HTML["
+    地図操作するためのHTML
+    +
+    世界地図のデータ
+  "]
+  Server[サーバー]
+
+  Server --> HTML
+  HTML --> Browser
+```
+
 見たい場所に移動するたびに画面を再読込する実装を想像してみてください。駅の隣の周りのコンビニを探すために少し右に移動してみます。画面が再読込されます。
 
 そうすると川があったのでこのあたりはコンビニがないなと思います。そしたら左に行こうとするので左に移動します、すると画面が再読込されて駅に戻ってきます。
 
+```mermaid
+graph RL
+  Browser[ブラウザ]
+  HTML1["
+    地図操作するためのHTML
+    +
+    地図データ1
+  "]
+  HTML2["
+    地図操作するためのHTML
+    +
+    地図データ2
+  "]
+  HTML3["
+    地図操作するためのHTML
+    +
+    地図データ3
+  "]
+  Server[サーバー]
+
+  Server --> HTML1
+  HTML1 --> Browser
+  Server --> HTML2
+  HTML2 --> Browser
+  Server --> HTML3
+  HTML3 --> Browser
+```
+
 この体験では地図で目的地を探すことが難しくなるでしょう。その再読み込みをなくしてくれたのがAjaxです。
 
 今ではAjaxと呼ばれることはすくなくなりました。ブラウザが進歩して、Ajaxとは異なる方法で非同期処理を行うことができるようになりました。
+
+```mermaid
+graph RL
+  Browser[ブラウザ]
+  HTML["地図操作するためのHTML"]
+  JSON1["地図データ1"]
+  JSON2["地図データ2"]
+  JSON3["地図データ3"]
+  Server[サーバー]
+
+  Server --> HTML
+  HTML --> Browser
+  Server --> JSON1
+  JSON1 --> Browser
+  Server --> JSON2
+  JSON2 --> Browser
+  Server --> JSON3
+  JSON3 --> Browser
+```
 
 長くなりましたが重要な概念なのでより想像しやすいように説明しました。
 
@@ -40,7 +101,7 @@ OSやブラウザによって起動方法が異なるので、自分の環境に
 ## 非同期処理の実行
 
 ```js
-const response = await fetch('https://zipcloud.ibsnet.co.jp/api/search?zipcode=8997103')
+const response = await fetch('https://zipcloud.ibsnet.co.jp/api/search?zipcode=8997２03')
 const data = await response.json()
 console.log(data.results[0])
 ```

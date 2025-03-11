@@ -149,6 +149,10 @@ createRoot(document.getElementById('root')).render(
 
 ### `index.html`
 
+削除した箇所以外に変更する場所は以下のとおりです。
+
+- `<html lang="ja">`
+
 ```html
 <!doctype html>
 <html lang="ja">

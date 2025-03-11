@@ -49,6 +49,12 @@ function App () {
 }
 ```
 
+```mermaid
+graph LR
+  App
+
+```
+
 ##　内容の整理
 
 この App コンポーネントの内容を整理してみましょう
@@ -155,6 +161,16 @@ function App () {
 ```
 
 Appの内容が整理されたと思います。
+
+```mermaid
+
+graph LR
+  App --> Navigation
+  App --> ProfileTanakaTaro
+  App --> ProfileYamadaHanako
+  App --> Caution
+
+```
 
 # Props の利用
 
@@ -271,6 +287,14 @@ function App () {
   )
 }
 
+```
+
+```mermaid
+graph LR
+  App --> Navigation
+  App --> ProfileA["Profile(田中太郎)"]
+  App --> ProfileB["Profile(山田花子)"]
+  App --> Caution
 ```
 
 # 配列の利用
@@ -415,6 +439,24 @@ function App () {
 }
 ```
 
+```mermaid
+graph LR
+  App
+  Navigation
+  subgraph people
+    ProfileA["Profile(田中太郎)"]
+    ProfileB["Profile(山田花子)"]
+    ProfileC["Profile(木村祐一)"]
+  end
+  Caution
+
+  App --> Navigation
+  App --> ProfileA
+  App --> ProfileB
+  App --> ProfileC
+  App --> Caution
+```
+
 これで動くようになっています。どのようにして動作しているのかを確認してみましょう。
 
 ## 配列の描画の動き方
@@ -524,12 +566,12 @@ function App () {
 このIDを下に画面を描画するタイミングを最適化しています。
 
 ```jsx
-  <Profile
-    key={5}
-    name="中村美咲"
-    introduction="お酒が好きで、週末は友達と飲み歩くことが多い。"
-    address="大阪府"
-    age="39" />
+<Profile
+  key={5}
+  name="中村美咲"
+  introduction="お酒が好きで、週末は友達と飲み歩くことが多い。"
+  address="大阪府"
+  age="39" />
 ```
 
 ### 3. 配列の内容をデータから作る
@@ -623,6 +665,7 @@ function App () {
   )
 }
 ```
+
 これが最初に提示した内容です。
 
 # ファイル分割
@@ -630,7 +673,6 @@ function App () {
 現在の App.jsx の内容を確認してみましょう。
 
 ```jsx
-
 function Navigation () {
   return (
     <div>
@@ -673,7 +715,6 @@ const people = [{
   address: "大阪府",
   age: "32"
 }, /* 省略 */]
-
 
 function App () {
   return (
@@ -755,7 +796,6 @@ function Navigation () {
 }
 
 export default Navigation
-
 ```
 
 
@@ -778,7 +818,6 @@ function Profile (props) {
 }
 
 export default Profile
-
 ```
 
 ## `Caution.jsx`
@@ -793,7 +832,6 @@ function Caution () {
 }
 
 export default Caution
-
 ```
 
 ## `data.js`
@@ -812,7 +850,6 @@ export const people = [{
   address: "大阪府",
   age: "32"
 }, /* 省略 */]
-
 ```
 
 ## 動作確認
@@ -820,7 +857,6 @@ export const people = [{
 ブラウザで動作確認をしてみましょう。
 
 各ファイルの中が整理された状態でも問題なく動作することがわかります。
-
 
 # まとめ
 

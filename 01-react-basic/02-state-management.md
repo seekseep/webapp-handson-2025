@@ -11,8 +11,6 @@ React は状態を元に画面を構築します。画面を変更する場合�
 
 これまでにフロントエンド開発をしてきたことのない人は読み飛ばしても構いません。
 
-
-
 ## 命令的UIの例
 
 ここではわかりやすくするためにわざとDOM操作を中心に実装しています。
@@ -53,6 +51,36 @@ React は状態を元に画面を構築します。画面を変更する場合�
 </script>
 ```
 
+```mermaid
+graph LR
+
+  User["ユーザー"]
+
+  User --> Control1
+  User --> Control2
+  User --> Control3
+
+  Control1["処理 1"]
+  Control2["処理 2"]
+  Control3["処理 3"]
+
+  DOMA["ビュー"]
+  DOMB["ビュー"]
+  DOMC["ビュー"]
+  DOMD["ビュー"]
+  DOME["ビュー"]
+
+  Control1 --> DOMA
+  Control2 --> DOMB
+  Control3 --> DOMC
+  Control1 --> DOMD
+  Control2 --> DOME
+  Control3 --> DOMD
+  Control1 --> DOMC
+  Control1 --> DOMB
+
+```
+
 
 ## 宣言的UIの例
 
@@ -76,7 +104,7 @@ function App() {
     setAnimal(animals.filter((_, i) => i !== index));
   };
 
-  return () => (
+  return (
     <div>
       <h1>動物</h1>
       <ul>
@@ -93,6 +121,41 @@ function App() {
     </div>
   );
 }
+```
+
+```mermaid
+graph LR
+
+  User["ユーザー"]
+
+  User --> Control1
+  User --> Control2
+  User --> Control3
+
+  Control1["処理 1"]
+  Control2["処理 2"]
+  Control3["処理 3"]
+
+  State["状態"]
+
+  DOMA["ビュー"]
+  DOMB["ビュー"]
+  DOMC["ビュー"]
+  DOMD["ビュー"]
+  DOME["ビュー"]
+
+  Control1 --> State
+  Control2 --> State
+  Control3 --> State
+
+  State --> DOMA
+  State --> DOMB
+  State --> DOMC
+  State --> DOMD
+  State --> DOME
+
+
+
 ```
 
 ## 比較
@@ -133,7 +196,6 @@ function App () {
     <h1>{count}</h1>
   )
 }
-
 ```
 
 `count` の中にいれる数字を変えてみて、変数に入る内容が変わると表示が切り替わることを確かめてみましょう。
@@ -152,7 +214,6 @@ function App () {
     </div>
   )
 }
-
 ```
 
 表示されたボタンを押してみてください。
@@ -267,6 +328,11 @@ function App () {
     </div>
   )
 }
+```
+
+```mermaid
+graph LR
+
 
 ```
 
