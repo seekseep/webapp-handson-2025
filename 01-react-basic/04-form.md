@@ -142,8 +142,6 @@ function App () {
 }
 ```
 
-これでは内容が空白でも送信できてしまうので、バリデーションを追加します。
-
 ## 初期値の設定
 
 `defaultValue` 属性を追加することで初期値を設定できます。
@@ -426,13 +424,13 @@ function App () {
       <label>
         名前:
         <input type="text" name="name" value={name} onChange={handleChangeName} />
-        {nameError && <p>{nameError}</p>}
       </label>
+        {nameError && <p>{nameError}</p>}
       <label>
         年齢:
         <input type="number" name="age" value={age} onChange={handleChangeAge} />
-        {ageError && <p>{ageError}</p>}
       </label>
+      {ageError && <p>{ageError}</p>}
       <button type="submit" disabled={!isValid}>
         {!isValid ? '入力してください' : '送信'}
       </button>

@@ -101,7 +101,7 @@ OSやブラウザによって起動方法が異なるので、自分の環境に
 ## 非同期処理の実行
 
 ```js
-const response = await fetch('https://zipcloud.ibsnet.co.jp/api/search?zipcode=8997２03')
+const response = await fetch('https://zipcloud.ibsnet.co.jp/api/search?zipcode=8997103')
 const data = await response.json()
 console.log(data.results[0])
 ```
