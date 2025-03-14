@@ -474,7 +474,8 @@ function App () {
     //   age: values.age,
     //   name: values.name
     // }
-    // neztValue.name = event.target.value
+    // nextValues.name = event.target.value
+    // setValues(nextValues)
     setValues({
       ...values,
       name: event.target.value
@@ -493,8 +494,8 @@ function App () {
     window.alert(`${values.name}さんは${values.age}歳です`)
   }
 
-  const nameError = validateName(name)
-  const ageError = validateAge(age)
+  const nameError = validateName(values.name)
+  const ageError = validateAge(values.age)
   const isValid = !nameError && !ageError
 
   return (
