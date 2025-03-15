@@ -720,7 +720,7 @@ function App () {
     fetchAddress(zipCode)
   }, [])
 
-  const zipcode = new URL(window.location.href).searchParams.get('zipcode') || ''
+  const zipcode = new URL(window.location.href).searchParams.get('zipcode') ?? ''
   return (
     <div>
       <h1>住所を表示する</h1>

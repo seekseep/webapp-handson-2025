@@ -77,6 +77,33 @@ function App () {
 }
 ```
 
+### テンプレートリテラル
+
+`window.alert(`${name}さん`)` のように文字列の中に変数を埋め込むことをテンプレートリテラルといいます。
+
+```js
+`文字列 ${変数} 文字列`
+```
+
+は次のコードと同じ意味を持ちます。
+
+```js
+"文字列" + 変数 + "文字列"
+```
+
+また、改行コードもそのまま使えます。
+
+```js
+`文字列
+文字列`
+```
+
+```js
+"文字列\n文字列"
+```
+
+この２つも同じ文字列になります。
+
 ## イベントのキャンセル
 
 今のままでは画面が再読込されているので次のコードを追加して再読み込みをやめる。
@@ -343,6 +370,112 @@ function App () {
 
 ```
 
+## `&&` と　`||` の使い方
+
+### truthy と falsy
+
+JavaScript では次の値は falsy として扱われます。
+
+- `false`
+- `null`
+- `undefined`
+- `0`
+- `NaN`
+- `''`
+
+それ以外の値は truthy として扱われます。
+
+### `&&`
+
+次のコードはそれぞれ同じ結果を返します。
+
+name に値が入っているときに表示する。
+
+```jsx
+function App () {
+  const name = 'Alice'
+  let nameNode = null
+  if (name) {
+    nameNode = <p>{name}</p>
+  }
+
+  return (
+    <div>
+      {nameNode}
+    </div>
+  )
+}
+
+```
+
+```jsx
+function App () {
+  const name = 'Alice'
+  const nameNode = name && <p>{name}</p>
+  return (
+    <div>
+      {nameNode}
+    </div>
+  )
+}
+```
+
+```jsx
+function App () {
+  const name = 'Alice'
+  return (
+    <div>
+      {name && <p>{name}</p>}
+    </div>
+  )
+}
+```
+
+### `||`
+
+次のコードはそれぞれ同じ結果を返します。
+
+name が falsy のときに表示する。
+
+```jsx
+function App () {
+  const name = ''
+  let nameNode = null
+  if (!name) {
+    nameNode = <p>名前がありません</p>
+  }
+
+  return (
+    <div>
+      {nameNode}
+    </div>
+  )
+}
+```
+
+```jsx
+function App () {
+  const name = ''
+  const nameNode = name || <p>名前がありません</p>
+  return (
+    <div>
+      {nameNode}
+    </div>
+  )
+}
+```
+
+```jsx
+function App () {
+  const name = ''
+  return (
+    <div>
+      {name || <p>名前がありません</p>}
+    </div>
+  )
+}
+```
+
 ## 送信ボタンを無効にする
 
 条件に応じて送信ボタンを無効にする
@@ -413,7 +546,7 @@ function App () {
   }
 
   let ageError = null
-  if (age < 0 || age > 200) {
+  if (Number.isNaN(+age) || age < 0 || age > 200) {
     ageError = '不正な値'
   }
 
@@ -518,6 +651,24 @@ function App () {
 }
 ```
 
+#### スプレッド構文
+
+`...` はスプレッド構文と呼ばれ、オブジェクトや配列を展開するために使われます。
+
+```js
+const obj = { a: 1, b: 2 }
+const obj2 = { ...obj, c: 3 }
+console.log(obj2) // { a: 1, b: 2, c: 3 }
+```
+
+```js
+const arr = [1, 2]
+const arr2 = [...arr, 3]
+console.log(arr2) // [1, 2, 3]
+```
+
+詳しくは、[スプレッド構文](スプレッド構文) を参照してください。
+
 ### 初期値
 
 次の箇所で初期値を設定できます。
@@ -548,6 +699,151 @@ HTMLの機能を使ったフォームの実装はコード量も少なく実装�
 
 この他にもいくつかありますが、これらのライブラリを使うことでフォームの実装を簡単にすることができます。
 
+## Formik
+
+Formik はフォームの状態管理、バリデーション、送信処理を簡単に実装できるライブラリです。
+
+yup というライブラリと組み合わせることでバリデーションの仕組みと表示の仕組みを分けて作ることもできます。
+
+```jsx
+import { Formik, Form, Field, ErrorMessage } from 'formik'
+import * as Yup from 'yup'
+
+const validationSchema = Yup.object().shape({
+  name: Yup.string()
+    .required("必須項目です")
+    .max(20, "20文字以内で入力してください"),
+  age: Yup.number()
+    .required("必須項目です")
+    .min(0, "0以上の数値を入力してください")
+    .max(200, "200以下の数値を入力してください")
+    .typeError("数値を入力してください"),
+  email: Yup.string()
+    .email("不正なメールアドレスです")
+    .required("必須項目です")
+})
+
+function App () {
+  const handleSubmit = (values) => {
+    console.log(values)
+  }
+  return (
+    <Formik
+      initialValues={{ name: '', age: 20, email: '' }}
+      onSubmit={handleSubmit}
+      validationSchema={validationSchema}>
+        {({ isValid }) => (
+          <Form>
+            <label>
+              名前:
+              <Field type="text" name="name" />
+              <ErrorMessage name="name" component="div" />
+            </label>
+            <label>
+              年齢:
+              <Field type="number" name="age" />
+              <ErrorMessage name="age" component="div" />
+            </label>
+            <label>
+              メールアドレス:
+              <Field type="email" name="email" />
+              <ErrorMessage name="email" component="div" />
+            </label>
+            <button type="submit" disabled={!isValid}>
+              送信
+            </button>
+          </Form>
+        )}
+    </Formik>
+  )
+}
+
+export default App
+```
+
+ただし、カスタマイズが難しかったりパフォーマンスの調整が難しいという欠点もあります。
+
+## React Hook Form
+
+React Hook Form を使う場合は次のように書きます。
+
+React Hook Form はパフォーマンスが高く、カスタマイズがしやすいという特徴があります。
+カスタマイズのしやすさはコードの量が増えることにも繋がります。
+
+```jsx
+import { useForm } from "react-hook-form";
+
+function App() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+  } = useForm({
+    mode: "onChange",
+    defaultValues: {
+      name: "",
+      age: 20,
+      email: "",
+    },
+  });
+
+  const onSubmit = (data) => {
+    console.log(data);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <label>
+        名前:
+        <input
+          {...register("name", {
+            required: "必須項目です",
+            maxLength: { value: 20, message: "20文字以内で入力してください" },
+          })}
+        />
+        {errors.name && <div>{errors.name.message}</div>}
+      </label>
+
+      <label>
+        年齢:
+        <input
+          type="number"
+          {...register("age", {
+            required: "必須項目です",
+            min: { value: 0, message: "0以上の数値を入力してください" },
+            max: { value: 200, message: "200以下の数値を入力してください" },
+            validate: (value) =>
+              isNaN(value) ? "数値を入力してください" : true,
+          })}
+        />
+        {errors.age && <div>{errors.age.message}</div>}
+      </label>
+
+      <label>
+        メールアドレス:
+        <input
+          type="email"
+          {...register("email", {
+            required: "必須項目です",
+            pattern: {
+              value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+              message: "不正なメールアドレスです",
+            },
+          })}
+        />
+        {errors.email && <div>{errors.email.message}</div>}
+      </label>
+
+      <button type="submit" disabled={!isValid}>
+        送信
+      </button>
+    </form>
+  );
+}
+
+export default App;
+```
+
 # まとめ
 
 フォームを作成するときには次の要素が重要になります。
@@ -558,5 +854,14 @@ HTMLの機能を使ったフォームの実装はコード量も少なく実装�
 - 送信(Submit)時の処理
 
 要件ごとに実装方法は変わりますが、Reactの機能を使うことで柔軟に対応できることがわかりました。
+
+ライブラリを活用する例も見ました。
+
+一番良いライブラリがあるというわけではなく、プロジェクトの要件に応じて選択することが重要です。
+
+ライブラリを使うのか、使わないのか、使う場合はどのライブラリを使うのか、それぞれのメリットとデメリットを理解して選択することが重要です。
+
+また、最終的には自身のプロジェクトの要件に応じてカスタマイズすることを求められることも多いです。
+その場合はそれぞれの選んだ方法を正しく理解することで保守性の高いコードになります。
 
 [非同期処理](05-async.md) に進みましょう。
