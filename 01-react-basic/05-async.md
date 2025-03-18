@@ -402,7 +402,7 @@ console.log(data)
 
 次のようなデータが返ってきます。
 
-```
+```json
 {
   "message": null,
   "results": null,
