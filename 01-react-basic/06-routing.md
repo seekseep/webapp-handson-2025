@@ -77,13 +77,11 @@ export default App
 
 ## 動作確認
 
-`npm start` でアプリを起動して、ブラウザで `http://localhost:3000/` を開いてください。
+`npm run dev` でアプリを起動してください。
 
-`http://localhost:3000/` にアクセスすると `トップページ` と表示されます。
-
-`http://localhost:3000/events/monthlydealevent/` にアクセスすると `セールページ` と表示されます。
-
-`http://localhost:3000/dp/B09M2XFRCF` にアクセスすると `商品ページ` と表示されます。
+- `http://localhost:5173/` にアクセスすると `トップページ` と表示されます。
+- `http://localhost:5173/events/monthlydealevent/` にアクセスすると `セールページ` と表示されます。
+- `http://localhost:5173/dp/B09M2XFRCF` にアクセスすると `商品ページ` と表示されます。
 
 ## リンクの追加
 
@@ -91,10 +89,10 @@ export default App
 
 ```mermaid
 graph LR
-  Top[ホーム] -->|セールを見る| Sale[セールページ]
+  Top[トップ] -->|セールを見る| Sale[セールページ]
   Sale -->|商品を見る| Item[商品ページ]
-  Item -->|ホームに戻る| Top
-  Sale -->|ホームに戻る| Top
+  Item -->|トップに戻る| Top
+  Sale -->|トップに戻る| Top
   Item -->|関連商品を見る| Sale
 ```
 
@@ -135,7 +133,7 @@ function Sale () {
       <hr />
       <Link to="/dp/B09M2XFRCF">商品ページ</Link>
       <br />
-      <Link to="/">ホームに戻る</Link>
+      <Link to="/">トップに戻る</Link>
     </div>
   )
 }
@@ -151,7 +149,7 @@ function Product () {
       <hr />
       <Link to="/events/monthlydealevent">セールページ</Link>
       <br />
-      <Link to="/">ホームに戻る</Link>
+      <Link to="/">トップに戻る</Link>
     </div>
   )
 }
@@ -193,7 +191,7 @@ function Product () {
       <hr />
       <Link to="/events/monthlydealevent">セールページ</Link>
       <br />
-      <Link to="/">ホームに戻る</Link>
+      <Link to="/">トップに戻る</Link>
     </div>
   )
 }
@@ -213,7 +211,7 @@ function Sale () {
       <hr />
       <Link to="/dp/B09M2XFRCF">商品ページ</Link>
       <br />
-      <Link to="/">ホームに戻る</Link>
+      <Link to="/">トップに戻る</Link>
     </div>
   )
 }
@@ -290,7 +288,7 @@ function Product () {
       <hr />
       <Link to="/events/monthlydealevent">セールページ</Link>
       <br />
-      <Link to="/">ホームに戻る</Link>
+      <Link to="/">トップに戻る</Link>
     </div>
   )
 }
@@ -317,7 +315,7 @@ function Product2 () {
       <hr />
       <Link to="/events/monthlydealevent">セールページ</Link>
       <br />
-      <Link to="/">ホームに戻る</Link>
+      <Link to="/">トップに戻る</Link>
     </div>
   )
 }
@@ -381,7 +379,7 @@ function Sale () {
       <Link to="/dp/B09M2XFRCF">ポップコーン</Link>
       <Link to="/dp/X00X0XXXXX">コーラ</Link>
       <br />
-      <Link to="/">ホームに戻る</Link>
+      <Link to="/">トップに戻る</Link>
     </div>
   )
 }
@@ -442,7 +440,7 @@ function Product () {
       <hr />
       <Link to="/events/monthlydealevent">セールページ</Link>
       <br />
-      <Link to="/">ホームに戻る</Link>
+      <Link to="/">トップに戻る</Link>
     </div>
   )
 }
@@ -475,7 +473,7 @@ function Product2 () {
       <hr />
       <Link to="/events/monthlydealevent">セールページ</Link>
       <br />
-      <Link to="/">ホームに戻る</Link>
+      <Link to="/">トップに戻る</Link>
     </div>
   )
 }
@@ -561,7 +559,7 @@ function Product () {
       <hr />
       <Link to="/events/monthlydealevent">セールページ</Link>
       <br />
-      <Link to="/">ホームに戻る</Link>
+      <Link to="/">トップに戻る</Link>
     </div>
   )
 }
@@ -606,6 +604,182 @@ const productsBySaleName = {
 }
 
 ```
+
+## 実装例
+
+パスは amazon を参考にしたものからデータに適応したものに変更しています。
+
+### ディレクトリ構造
+
+```
+./src
+├── App.jsx
+├── data.js
+├── main.jsx
+└── routes
+    ├── Product.jsx
+    ├── Sale.jsx
+    └── Top.jsx
+```
+
+### `App.jsx`
+
+```jsx
+import { BrowserRouter, Route, Routes } from "react-router-dom"
+import Top from "./routes/Top"
+import Sale from "./routes/Sale"
+import Product from "./routes/Product"
+
+function App () {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Top />} />
+        <Route path="/sales/:saleName" element={<Sale />} />
+        <Route path="/sales/:saleName/products/:productId" element={<Product />} />
+      </Routes>
+    </BrowserRouter>
+  )
+}
+
+export default App
+
+```
+
+### `data.js`
+
+```js
+const productsBySaleName = {
+  'monthlydealevent': [{
+    id: 'B09M2XFRCF',
+    name: 'ポップコーン',
+    price: 1000,
+    description: 'おいしいポップコーンです。'
+  }, {
+    id: 'X00X0XXXXX',
+    name: 'コーラ',
+    price: 300,
+    description: '普通のコーラです。'
+  }],
+  'specialevent': [{
+    id: 'Y00Y0YYYYY',
+    name: 'ポテトチップス',
+    price: 200,
+    description: 'おいしいポテトチップスです。'
+  }, {
+    id: 'Z00Z0ZZZZZ',
+    name: 'オレンジジュース',
+    price: 400,
+    description: 'おいしいオレンジジュースです。'
+  }]
+}
+
+export function getSales () {
+  return Object.keys(productsBySaleName)
+}
+
+export function getSaleProducts (saleName) {
+  return productsBySaleName[saleName]
+}
+
+export function getSaleProduct (saleName, productId) {
+  const saleProducts = productsBySaleName[saleName]
+  for (const product of saleProducts) {
+    if (product.id === productId) {
+      return product
+    }
+  }
+  return null
+}
+
+```
+
+### `routes/Product.jsx`
+
+```jsx
+import { useParams, Link } from "react-router-dom"
+import { getSaleProduct } from "../data"
+
+function Product () {
+  const { saleName, productId } = useParams()
+  const product = getSaleProduct(saleName, productId)
+
+  return (
+    <div>
+      <h1>商品ページ</h1>
+
+      <h2>商品名: {product.name}</h2>
+      <p>価格: {product.price}円</p>
+      <p>商品説明: {product.description}</p>
+      <button>購入する</button>
+
+      <hr />
+      <Link to={`/sales/${saleName}`}>セールページ</Link>
+      <br />
+      <Link to="/">トップに戻る</Link>
+    </div>
+  )
+}
+
+export default Product
+
+```
+
+### `routes/Sale.jsx`
+
+```jsx
+import { useParams, Link } from "react-router-dom"
+import { getSaleProducts } from "../data"
+
+function Sale () {
+  const { saleName } = useParams()
+  const products = getSaleProducts(saleName)
+  return (
+    <div>
+      <h1>セール: {saleName}</h1>
+      <ul>
+        {products.map(product => (
+          <li key={product.id}>
+            <Link to={`/sales/${saleName}/products/${product.id}`}>{product.name}</Link>
+          </li>
+        ))}
+      </ul>
+      <hr />
+      <Link to="/">トップに戻る</Link>
+    </div>
+  )
+}
+
+export default Sale
+
+```
+
+### `routes/Top.jsx`
+
+```jsx
+import { Link } from "react-router-dom"
+import { getSales } from "../data"
+
+function Top () {
+  const sales = getSales()
+  return (
+    <div>
+      <h1>トップ</h1>
+      <ul>
+        {sales.map(sale => (
+          <li key={sale}>
+            <Link to={`/sales/${sale}`}>{sale}</Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+export default Top
+
+```
+
 
 # まとめ
 
