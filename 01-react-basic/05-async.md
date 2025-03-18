@@ -95,10 +95,14 @@ OSやブラウザによって起動方法が異なるので、自分の環境に
 
 - [Chrome DevTools](https://developer.chrome.com/docs/devtools)
 - [Edge DevTools](https://learn.microsoft.com/ja-jp/microsoft-edge/devtools-guide-chromium/landing/)
+- [Safari](https://support.apple.com/ja-jp/guide/safari/sfri20948/mac)
+- [Firefox DevTools](https://developer.mozilla.org/ja/docs/Tools)
 
 開発者ツールを開くと、コンソールというタブがあります。コンソールに次のコードを入力してください。
 
 ## 非同期処理の実行
+
+**開発者ツールのコンソールで次のコードを入力してください。**
 
 ```js
 const response = await fetch('https://zipcloud.ibsnet.co.jp/api/search?zipcode=8997103')
@@ -137,18 +141,21 @@ const response = await fetch('https://zipcloud.ibsnet.co.jp/api/search?zipcode=8
 
 次の関数は郵便番号を引数に取り、その郵便番号に対応する住所を返す関数です。
 
+**開発者ツールのコンソールで次のコードを入力してください。**
+
 ```js
 async function fetchAddressByZipcode (zipcode) {
   const response = await fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${zipcode}`)
   const data = await response.json()
   return data.results[0]
 }
-
 ```
 
 `async` というキーワードが関数の前についています。このキーワードがついた関数は非同期で実行される関数です。`async` キーワードがついている関数の中では `await` キーワードを使うことができます。逆に `await` キーワードが使えるのは `async` キーワードがついている関数の中だけです。
 
 この関数を使って郵便番号 `8997103` に対応する住所を取得してみましょう。
+
+**開発者ツールのコンソールで次のコードを入力してください。**
 
 ```js
 const address1 = await fetchAddressByZipcode('8997103')
@@ -274,6 +281,7 @@ function App () {
   )
 }
 
+export default App
 ```
 
 入力した郵便番号に対応する住所が表示されるようになりました。
@@ -372,8 +380,7 @@ function App () {
 
 ```js
 if (!/^[0-9]{7}$/.test(zipCode)) {
-  setError('郵便番号は7桁の数字で入力してください')
-  return
+  throw new Error('郵便番号は7桁の数字で入力してください')
 }
 ```
 
@@ -381,7 +388,11 @@ if (!/^[0-9]{7}$/.test(zipCode)) {
 
 #　存在しない郵便番号の対応
 
+## データ取得の動作の確認
+
 開発者ツールに戻って存在しない郵便番号にアクセスしてみましょう。
+
+**開発者ツールのコンソールで次のコードを入力してください。**
 
 ```js
 const response = await fetch('https://zipcloud.ibsnet.co.jp/api/search?zipcode=9999999')
@@ -400,6 +411,8 @@ console.log(data)
 ```
 
 `data.results` が `null` となっていれば存在しないことがわかります。
+
+##　住所取得時のエラー処理
 
 `fetchAddressByZipcode` 関数を修正して存在しない郵便番号の場合にエラーを投げるようにします。
 
@@ -422,16 +435,15 @@ async function fetchAddressByZipcode (zipcode) {
 
 ```jsx
 async function handleSubmit (event) {
-      event.preventDefault()
-    const data = new FormData(event.target)
-    const zipCode = data.get('zipcode')
-
-    if (!/^[0-9]{7}$/.test(zipCode)) {
-      setError('郵便番号は7桁の数字で入力してください')
-      return
-    }
-
     try {
+      event.preventDefault()
+      const data = new FormData(event.target)
+      const zipCode = data.get('zipcode')
+
+      if (!/^[0-9]{7}$/.test(zipCode)) {
+        throw new Error('郵便番号は7桁の数字で入力してください')
+      }
+
       const address = await fetchAddressByZipcode(zipCode)
       setAddress(address)
     } catch (error) {
@@ -441,16 +453,7 @@ async function handleSubmit (event) {
 
 ```
 
-```js
-    try {
-      const address = await fetchAddressByZipcode(zipCode)
-      setAddress(address)
-    } catch (error) {
-      setError(error.message)
-    }
-```
-
-## 違う書き方
+## error を投げない方法
 
 error を投げる方法に馴染みのない人は次の書き方もできます
 

@@ -78,9 +78,7 @@ graph LR
   Control3 --> DOMD
   Control1 --> DOMC
   Control1 --> DOMB
-
 ```
-
 
 ## 宣言的UIの例
 
@@ -153,9 +151,6 @@ graph LR
   State --> DOMC
   State --> DOMD
   State --> DOME
-
-
-
 ```
 
 ## 比較
@@ -182,7 +177,6 @@ function App () {
 }
 
 export default App
-
 ```
 
 ## 変数に入った数字の表示
@@ -196,6 +190,8 @@ function App () {
     <h1>{count}</h1>
   )
 }
+
+export default App
 ```
 
 `count` の中にいれる数字を変えてみて、変数に入る内容が変わると表示が切り替わることを確かめてみましょう。
@@ -214,6 +210,8 @@ function App () {
     </div>
   )
 }
+
+export default App
 ```
 
 表示されたボタンを押してみてください。
@@ -242,6 +240,7 @@ function App () {
   )
 }
 
+export default App
 ```
 
 クリックされたらアラートを表示するという処理を追加しました。
@@ -272,6 +271,7 @@ function App () {
   )
 }
 
+export default App
 ```
 
 ボタンを押しても数字が増えません。
@@ -295,6 +295,7 @@ function App () {
   )
 }
 
+export default App
 ```
 
 アラートでは数字が増えていることが確認できます。
@@ -328,12 +329,8 @@ function App () {
     </div>
   )
 }
-```
 
-```mermaid
-graph LR
-
-
+export default App
 ```
 
 setCount を使うことで count の値を変更することと再描画を行うことができます。
@@ -379,6 +376,8 @@ function App () {
     </div>
   )
 }
+
+export default App
 
 ```
 

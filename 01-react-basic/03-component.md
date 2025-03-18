@@ -47,6 +47,8 @@ function App () {
     </div>
   )
 }
+
+export default App
 ```
 
 ```mermaid
@@ -158,6 +160,8 @@ function App () {
     </div>
   )
 }
+
+export default App
 ```
 
 Appの内容が整理されたと思います。
@@ -286,7 +290,6 @@ function App () {
     </div>
   )
 }
-
 ```
 
 ```mermaid
@@ -614,8 +617,6 @@ function App () {
     </div>
   )
 }
-
-
 ```
 
 これは次のようにも書くことができます。

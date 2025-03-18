@@ -20,6 +20,8 @@ function App () {
     </form>
   )
 }
+
+export default App
 ```
 
 ## フォーム送信時の処理
@@ -47,6 +49,8 @@ function App () {
     </form>
   )
 }
+
+export default App
 ```
 
 ## 値の取得
@@ -75,6 +79,8 @@ function App () {
     </form>
   )
 }
+
+export default App
 ```
 
 ### テンプレートリテラル
@@ -131,6 +137,8 @@ function App () {
     </form>
   )
 }
+
+export default App
 ```
 
 ## 値の追加
@@ -138,7 +146,6 @@ function App () {
 値を追加してみましょう。
 
 ```jsx
-
 function App () {
   function handleSubmit (event) {
     event.preventDefault()
@@ -167,6 +174,8 @@ function App () {
     </form>
   )
 }
+
+export default App
 ```
 
 ## 初期値の設定
@@ -203,6 +212,7 @@ function App () {
   )
 }
 
+export default App
 ```
 
 ## バリデーション
@@ -238,6 +248,8 @@ function App () {
     </form>
   )
 }
+
+export default App
 ```
 
 この状態でも次のような問題が残っています。
@@ -283,6 +295,8 @@ function App () {
     </form>
   )
 }
+
+export default App
 ```
 
 他にもバリデーションの方法はいくつかある。
@@ -333,6 +347,8 @@ function App () {
     </form>
   )
 }
+
+export default App
 ```
 
 ## 入力欄のヒントを出す
@@ -368,6 +384,7 @@ function App () {
   )
 }
 
+export default App
 ```
 
 ## `&&` と　`||` の使い方
@@ -514,6 +531,8 @@ function App () {
     </form>
   )
 }
+
+export default App
 ```
 
 ## 入力欄ごとにエラーを表示する
@@ -570,6 +589,8 @@ function App () {
     </form>
   )
 }
+
+export default App
 ```
 
 ## リファクタリング
@@ -649,6 +670,8 @@ function App () {
     </form>
   )
 }
+
+export default App
 ```
 
 #### スプレッド構文
