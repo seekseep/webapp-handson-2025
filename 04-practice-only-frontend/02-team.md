@@ -383,9 +383,9 @@ export async function updateTeam (team) {
   save()
 }
 
-export async function deleteTeam (team) {
-  if (!teams[team.id]) throw new Error('組織が見つかりません')
-  delete teams[team.id]
+export async function deleteTeam (id) {
+  if (!teams[id]) throw new Error('組織が見つかりません')
+  delete teams[id]
   save()
 }
 
