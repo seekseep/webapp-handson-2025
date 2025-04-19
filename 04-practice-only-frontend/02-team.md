@@ -490,8 +490,8 @@ export default TeamSingle;
 
 ```js
 export const getCustomersByTeamId (teamId) {
-  const customers = Object.values(customers)
-  const teamCustomers = customers.filter(customer => customer.teamId === teamId)
+  const allCustomers = Object.values(customers)
+  const teamCustomers = allCustomers.filter(customer => customer.teamId === teamId)
   return teamCustomers
 }
 
