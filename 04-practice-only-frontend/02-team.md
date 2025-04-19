@@ -1,10 +1,10 @@
 # 機能追加
 
-お客さんに見せた後にお客さんがこんなことを言いました。
+友人にプロトタイプを見せたところ次のような意見をもらいました。
 
-> 顧客は会社とかの組織に属しているからそれでグループを分けたい。グループごとに顧客を一覧したい。
+> 顧客は会社とかの組織に属しているからそれで組織を分けたい。組織ごとに顧客を一覧したい。
 
-この要望に対応するために、グループを追加する機能を追加してましょう。
+この要望に対応するために、組織を追加する機能を追加してましょう。
 
 # データを考える
 
@@ -62,7 +62,7 @@ graph LR
 次のように画面を作成してください。
 
 | 画面名 | 説明 | コンポーネント |
-| --- | --- |
+| --- | --- | --- |
 | 🆕 組織一覧 | 組織の一覧を表示する | `TeamCollection` |
 | 🆕 組織作成 | 組織を作成する | `TeamCreate` |
 | 🆕 組織詳細 | 組織の詳細とそれに属する | `TeamSingle` |
@@ -378,14 +378,14 @@ export async function getTeam (id) {
 }
 
 export async function updateTem (team) {
-  if (!teams[id]) throw new Error('組織が見つかりません')
-  teams[id] = team
+  if (!teams[team.id]) throw new Error('組織が見つかりません')
+  teams[team.id] = team
   save()
 }
 
-export async function deleteTeam (id) {
-  if (!teams[id]) throw new Error('組織が見つかりません')
-  delete teams[id]
+export async function deleteTeam (team) {
+  if (!teams[team.id]) throw new Error('組織が見つかりません')
+  delete teams[team.id]
   save()
 }
 
@@ -497,6 +497,10 @@ export const getCustomersByTeamId (teamId) {
 
 ```
 
+- `const customers = Object.values(customers)` では `customers` オブジェクトの値を配列に変換しています。
+- `const teamCustomers = customers.filter(customer => customer.teamId === teamId)` では `teamId` が一致する顧客をフィルタリングしています。
+- `return teamCustomers` でフィルタリングした顧客の配列を返しています。
+
 ## `src/routes/CustomerCollection.jsx`
 
 顧客一覧の修正として次の変更をします。
@@ -536,6 +540,8 @@ useEffect(() => {
 
 ### 顧客作成画面へのリンク
 
+顧客作成画面へのリンクを追加します。
+
 ```jsx
 <p>
   <Link to={`/${params.teamId}/new`}>新規作成</Link>
@@ -543,6 +549,8 @@ useEffect(() => {
 ```
 
 ### 顧客詳細画面へのリンク
+
+パスの指定に注意して顧客詳細画面へのリンクを設定してください。
 
 ```jsx
 <ul>
@@ -604,6 +612,9 @@ const handleSubmit = async (event) => {
 
 ```
 
+`teamId: params.teamId` で組織IDを指定しています。
+`createCustomer` の引数に `teamId` を指定することで、顧客を作成する際に組織IDを指定しています。
+
 ### リンクの修正
 
 ```jsx
@@ -634,3 +645,26 @@ const params = useParams()
 ```jsx
 <Link to={`/${params.teamId}/customers`}>顧客一覧に戻る</Link>
 ```
+
+# 動作確認
+
+ここまでですべての画面に対しての修正をしました。
+
+次の動作を確認しましょう。
+
+- 組織の作成
+- 組織の一覧の表示
+- 組織の単一の表示
+- 組織の更新
+- 組織の削除
+- 組織ごとの顧客の一覧の表示
+- 組織を指定した顧客の作成
+- 顧客の表示
+- 顧客の更新
+- 顧客の削除
+
+動作確認ができればプロトタイプの作成の完了です。
+
+また、友人に見せに行けるようになりました。
+
+[次の機能追加](./03-note.md)

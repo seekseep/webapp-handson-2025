@@ -1,11 +1,12 @@
 # 顧客を管理する
 
-お客さんから顧客情報を管理したいという要望がありました。
-あなたは顧客管理アプリを作ろうと思います。
+あなたの友人はある製品メーカーの営業をしています。
 
-プロジェクトの先行きも不透明なためある程度の確信を持ってから本格的な開発を行いたいと言われました。
+営業をするときに社内では紙を使って顧客管理をしていました。
 
-そこでプロトタイプを作ってみることにしました。
+「こんな時代に紙で管理するなんておかしいと思う」とあなたに相談がありました。そこで、あなたは友人の会社で使う顧客管理アプリを作ってみようと思いました。
+
+いきなり完全なものを作るのは難しいのでまずは簡単な形から作ってみます。
 
 # データを考える
 
@@ -67,9 +68,68 @@ Vite を使ってプロジェクトを作成しましょう。
 
 CRM は Customer Relationship Management の略です。
 
-プロジェクトの名前は好きなものをつけてください。
+`my-crm` はつくられるディレクトリの名前です。好きなものをつけてください。
+
+## 対話モード
+
+対話モードでは次のように答えてください。
+
+```
+% npm create vite@latest my-crm
+Need to install the following packages:
+create-vite@6.4.1
+Ok to proceed? (y) y
+│
+◇  Select a framework:
+│  React
+│
+◇  Select a variant:
+│  JavaScript
+│
+◇  Scaffolding project in /Users/seekseep/Desktop/my-crm...
+│
+└  Done. Now run:
+
+  cd my-crm
+  npm install
+  npm run dev
+```
+
+## 動作確認
+
+`my-crm` ディレクトリに移動して、依存パッケージをインストールします。
+
+```powershell
+> cd my-crm
+> npm install
+```
+
+npm install で依存パッケージをインストールします。少し時間がかかります。
+
+`npm run dev` で起動します。
+
+```powershell
+> npm run dev
+
+
+  VITE v6.3.2  ready in 183 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+```
+
+ブラウザに次のURLを入力して表示されることを確認します。
+
+```
+http://localhost:5173/
+```
 
 ## 依存パッケージのインストール
+
+一度起動しているサーバーを止めて依存パッケージをインストールします。
+
+`Ctrl + C` でサーバーを止めることができます。
 
 画面遷移のライブラリをインストールします。
 
@@ -96,7 +156,15 @@ CRM は Customer Relationship Management の略です。
     └── CustomerSingle.jsx
 ```
 
+- `*Single` は単一表示の意味を示しています。
+- `*Collection` は一覧表示の意味を示しています。
+- `*Create` は作成の意味を示しています。
+
+それぞれに対して規則を持つことで今後の機能追加のときに迷わないようにします。
+
 ## `main.jsx`
+
+既存のコードの書き換えです。
 
 ```jsx
 import { StrictMode } from 'react'
@@ -113,6 +181,8 @@ createRoot(document.getElementById('root')).render(
 
 ## `App.jsx`
 
+既存のコードの書き換えです。
+
 パスとコンポーネントの対応を設定します。
 
 | パス | コンポーネント | 画面名 |
@@ -120,6 +190,8 @@ createRoot(document.getElementById('root')).render(
 | `/` | `CustomerCollection` | 顧客一覧 |
 | `/:id` | `CustomerSingle` | 顧客詳細 |
 | `/new` | `CustomerCreate` | 顧客作成 |
+
+`/:id` はパスパラメータを取得するために設定しています。くわしくは [ルーティング](../01-react-basic/03-routing.md) を参照してください。
 
 ```jsx
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
@@ -143,7 +215,20 @@ export default App
 
 ```
 
+### 注意事項
+
+次の行の順番は重要です。間違っていないか注意してください。
+
+```jsx
+<Route path="/:id" element={<CustomerSingle />} />
+<Route path="/new" element={<CustomerCreate />} />
+```
+
 ## `src/routes/CustomerCollection.jsx`
+
+新しくファイルを作ります。
+
+このコンポーネントでは顧客一覧を表示します。この段階ではタイトルだけを表示します。
 
 ```jsx
 function CustomerCollection () {
@@ -151,14 +236,20 @@ function CustomerCollection () {
     <div>
       <h1>顧客一覧</h1>
     </div>
-  );
+  )
 }
 
-export default CustomerCollection;
+export default CustomerCollection
 
 ```
 
+`export default CustomerCollection` この行を忘れないようにしてください。
+
 ## `src/routes/CustomerSingle.jsx`
+
+新しくファイルを作ります。
+
+このコンポーネントでは顧客詳細を表示します。この段階ではタイトルだけを表示します。
 
 ```jsx
 function CustomerSingle () {
@@ -166,14 +257,18 @@ function CustomerSingle () {
     <div>
       <h1>顧客詳細</h1>
     </div>
-  );
+  )
 }
 
-export default CustomerSingle;
+export default CustomerSingle
 
 ```
 
 ## `src/routes/CustomerCreate.jsx`
+
+新しくファイルを作ります。
+
+このコンポーネントでは顧客作成を表示します。この段階ではタイトルだけを表示します。
 
 ```jsx
 function CustomerCreate () {
@@ -181,10 +276,10 @@ function CustomerCreate () {
     <div>
       <h1>顧客作成</h1>
     </div>
-  );
+  )
 }
 
-export default CustomerCreate;
+export default CustomerCreate
 
 ```
 
@@ -199,6 +294,13 @@ export default CustomerCreate;
 | `http://localhost:3000/` | 顧客一覧 |
 | `http://localhost:3000/1` | 顧客詳細 |
 | `http://localhost:3000/new` | 顧客作成 |
+
+```mermaid
+graph LR
+  A[顧客一覧]
+  B[顧客詳細]
+  C[顧客作成]
+```
 
 # 各画面の遷移
 
@@ -228,17 +330,23 @@ function CustomerCollection () {
         </li>
       </ul>
     </div>
-  );
+  )
 }
 
-export default CustomerCollection;
+export default CustomerCollection
 
+```
+
+ここでの `/cutomer-1` は `/:id` に対応します。
+
+```jsx
+<Route path="/:id" element={<CustomerSingle />} />
 ```
 
 ## `src/routes/CustomerSingle.jsx`
 
 ```jsx
-import { Link } from "react-router-dom";
+import { Link } from "react-router-dom"
 
 function CustomerSingle () {
   return (
@@ -247,10 +355,10 @@ function CustomerSingle () {
       <hr />
       <Link to="/">顧客一覧に戻る</Link>
     </div>
-  );
+  )
 }
 
-export default CustomerSingle;
+export default CustomerSingle
 
 ```
 
@@ -266,10 +374,10 @@ function CustomerCreate () {
       <hr />
       <Link to="/">顧客一覧に戻る</Link>
     </div>
-  );
+  )
 }
 
-export default CustomerCreate;
+export default CustomerCreate
 
 ```
 
@@ -295,6 +403,8 @@ erDiagram
 
 顧客作成画面にフォームを追加します。
 
+フォームの作成方法については [フォーム](../01-react-basic/04-form.md) を参照してください。
+
 `src/routes/CustomerCreate.jsx`
 
 ```jsx
@@ -312,6 +422,7 @@ function CustomerCreate () {
     event.preventDefault()
     console.log(values)
   }
+
   return (
     <div>
       <h1>顧客作成</h1>
@@ -365,12 +476,30 @@ function CustomerCreate () {
       <hr />
       <Link to="/">顧客一覧に戻る</Link>
     </div>
-  );
+  )
 }
 
-export default CustomerCreate;
+export default CustomerCreate
 
 ```
+
+フォームが送信されると次の関数が呼び出されます。
+
+この段階ではログが表示されるだけです。ログは各ブラウザの開発者ツールで確認することができます。
+
+開発者ツールは各ブラザで表示方法は異なります。
+
+Google Chrome の場合は右クリックから「検証」という項目を選択することで表示できます。
+
+入力されている内容が表示できれば完了です。
+
+```js
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    console.log(values)
+  }
+```
+
 
 ## 顧客の作成
 
@@ -378,9 +507,11 @@ export default CustomerCreate;
 
 `src/storage.js` を作ります。
 
-`createCustomer` は非同期処理として書きます。これはWebAPIへのアクセスを想定しています。
+このファイルではLocalStorageからデータの読み書きを行います。
 
-`createCustomerId` は現在のタイムスタンプに対して `customer-` をつけておく。
+最終的にはWebAPIを使うことを想定しているので対応する処理は非同期関数にします。
+
+`createCustomerId` は現在のタイムスタンプに対して `customer-` をつけておきます。
 
 ```js
 const customers = {}
@@ -397,6 +528,10 @@ export async function createCustomer (customer) {
 }
 
 ```
+
+この段階ではLocalStorageには保存されません。
+
+ブラウザのメモリ上にデータが存在します。
 
 ### `src/routes/CustomerCreate.jsx`
 
@@ -434,7 +569,7 @@ const handleSubmit = async (event) => {
 
 ### 顧客一覧の取得
 
-`getCustomers` を追加します。
+`src/storage.js` に `getCustomers` を追加します。
 
 ```jsx
 const customers = {}
@@ -462,10 +597,14 @@ export async function getCustomers () {
 
 `getCustomers` を使ってデータを取得します。
 
+画面を表示した段階でデータを取得する処理を実装します。
+
+詳しくは [非同期処理](../01-react-basic/05-async.md) を参照してください。
+
 ```jsx
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { getCustomers } from '../storage';
+import { getCustomers } from '../storage'
 
 function CustomerCollection () {
   const [customers, setCustomers] = useState([])
@@ -508,12 +647,36 @@ function CustomerCollection () {
         ))}
       </ul>
     </div>
-  );
+  )
 }
 
-export default CustomerCollection;
+export default CustomerCollection
 
 ```
+
+次の表示箇所では以下の表に表示が切り替わります。
+
+- `loading` が `true` のときは `<p>読み込み中...</p>` を表示
+- `error` があるときは `<p>エラーが発生しました: {error.message}</p>` を表示
+- `customers.length < 1` のときは `<p>顧客が作成されていません</p>` を表示
+- `customers` があるときは顧客の一覧を表示
+
+```jsx
+{loading && <p>読み込み中...</p>}
+{error && <p>エラーが発生しました: {error.message}</p>}
+{customers.length < 1 && <p>顧客が作成されていません</p>}
+<ul>
+  {customers.map((customer) => (
+    <li key={customer.id}>
+      <Link to={`/${customer.id}`}>
+        {customer.name}
+      </Link>
+    </li>
+  ))}
+</ul>
+```
+
+ここでの表示の仕方の詳細は [コンポーネント](../01-react-basic/03-component.md) を参照してください。
 
 #### 状態管理
 
@@ -559,13 +722,13 @@ useEffect(() => {
 
 ## 顧客の取得
 
-`getCustomer` を追加します。
+`src/storage.js` に `getCustomer` を追加します。
 
 IDを指定したらそのIDのデータを取得します。
 
 ```jsx
 export async function getCustomer (id) {
-  return customer[id];
+  return customer[id]
 }
 
 ```
@@ -574,12 +737,15 @@ export async function getCustomer (id) {
 
 顧客を取得して表示することができます。
 
+`const param = useParams()` でパスパラメータを取得します。
+`/:id` の部分が `param.id` に入ります。
+
 ```jsx
-import { Link, useParams } from "react-router-dom";
-import { getCustomer } from "../storage";
+import { Link, useParams } from "react-router-dom"
+import { getCustomer } from "../storage"
 
 function CustomerSingle () {
-  const param = useParams();
+  const param = useParams()
   const [customer, setCustomer] = useState(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -617,10 +783,10 @@ function CustomerSingle () {
       <hr />
       <Link to="/">顧客一覧に戻る</Link>
     </div>
-  );
+  )
 }
 
-export default CustomerSingle;
+export default CustomerSingle
 
 ```
 
@@ -647,7 +813,7 @@ useEffect(() => {
 export async function getCustomer (id) {
   const customer = customers[id]
   if (!customer) throw new Error('顧客が見つかりません')
-  return customer[id];
+  return customer[id]
 }
 ```
 
@@ -655,9 +821,7 @@ WebAPIを利用する場合はWebAPIがエラーを返すことが一般的で�
 
 # 顧客の編集
 
-作成したデータを編集する機能を作ります。
-
-ここでは画面を増やさずにこの画面で編集できるようにします。
+単一表示の画面に対して顧客を編集する機能を作ります。
 
 ## フォームの作成
 
@@ -667,11 +831,11 @@ WebAPIを利用する場合はWebAPIがエラーを返すことが一般的で�
 ID は変更できないようにします。
 
 ```jsx
-import { Link, useParams } from "react-router-dom";
-import { getCustomer } from "../storage";
+import { Link, useParams } from "react-router-dom"
+import { getCustomer } from "../storage"
 
 function CustomerSingle () {
-  const param = useParams();
+  const param = useParams()
 
   const [customer, setCustomer] = useState(null)
   const [error, setError] = useState(null)
@@ -694,9 +858,9 @@ function CustomerSingle () {
   }, [param.id])
 
   const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log(customer);
-    alert("変更しました");
+    event.preventDefault()
+    console.log(customer)
+    alert("変更しました")
   }
 
   return (
@@ -743,10 +907,10 @@ function CustomerSingle () {
       <hr />
       <Link to="/">顧客一覧に戻る</Link>
     </div>
-  );
+  )
 }
 
-export default CustomerSingle;
+export default CustomerSingle
 
 ```
 
@@ -769,8 +933,8 @@ export async function updateCustomer (customer) {
 `updateCustomer` を呼び出します。
 
 ```jsx
-import { Link, useParams } from "react-router-dom";
-import { getCustomer, updateCustomer } from "../storage";
+import { Link, useParams } from "react-router-dom"
+import { getCustomer, updateCustomer } from "../storage"
 ```
 
 ```js
@@ -778,11 +942,11 @@ import { getCustomer, updateCustomer } from "../storage";
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
   const handleSubmit = async (event) => {
-    event.preventDefault();
+    event.preventDefault()
     setLoading(true)
     try {
-      await updateCustomer(customer);
-      alert("変更しました");
+      await updateCustomer(customer)
+      alert("変更しました")
     } catch (error) {
       setError(error)
     } finally {
@@ -803,7 +967,7 @@ import { getCustomer, updateCustomer } from "../storage";
 
 ## 顧客の削除
 
-`deleteCustomer` を追加します。
+`src/storage.js` に `deleteCustomer` を追加します。
 
 次の２つの処理の結果は同じです。
 
@@ -820,8 +984,8 @@ export async function deleteCustomer (id) {
 `src/routes/CustomerSingle.jsx`
 
 ```jsx
-import { Link, useParams } from "react-router-dom";
-import { deleteCustomer, getCustomer, updateCustomer } from "../storage";
+import { Link, useParams } from "react-router-dom"
+import { deleteCustomer, getCustomer, updateCustomer } from "../storage"
 
 function CustomerSingle () {
   const [customer, setCustomer] = useState(null)
@@ -831,8 +995,8 @@ function CustomerSingle () {
   const handleDelete = async () => {
     setLoading(true)
     try {
-      alert("削除しました");
-      await deleteCustomer(param.id);
+      alert("削除しました")
+      await deleteCustomer(param.id)
     } catch (error) {
       setError(error)
     } finally {
@@ -855,10 +1019,10 @@ function CustomerSingle () {
       <hr />
       <Link to="/">顧客一覧に戻る</Link>
     </div>
-  );
+  )
 }
 
-export default CustomerSingle;
+export default CustomerSingle
 
 ```
 
@@ -874,22 +1038,22 @@ export default CustomerSingle;
 `useNavigate` をインポートします。
 
 ```js
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom"
 ```
 
 ```js
 function CustomerSingle () {
-  const param = useParams();
-  const navigate = useNavigate();
+  const param = useParams()
+  const navigate = useNavigate()
 ```
 
 削除時に遷移します。
 
 ```js
 const handleDelete = async () => {
-  await deleteCustomer(param.id);
-  alert("削除しました");
-  navigate("/");
+  await deleteCustomer(param.id)
+  alert("削除しました")
+  navigate("/")
 }
 ```
 
@@ -902,6 +1066,8 @@ const handleDelete = async () => {
 次の処理で localStorage に書き込みます。
 
 ```js
+const STORAGE_KEY = 'customers'
+
 function save () {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(customers))
 }
@@ -945,9 +1111,9 @@ export function deleteCustomer (id) {
 
 ## 画面起動時に読み込み
 
-`src/main.js`
+`src/main.js` はエントリポイントと呼ばれ画面が表示されるときに呼び出されるファイルです。
 
-`load` を呼び出します。
+画面表示時に `load` を呼び出します。
 
 ```jsx
 import { StrictMode } from 'react'
@@ -970,17 +1136,41 @@ createRoot(document.getElementById('root')).render(
 
 # まとめ
 
-これでお客さんにプロトタイプを見せることができます。
+これで友人に顧客管理アプリのプロトタイプを見せることができます。
 
-ここまでで顧客の情報の作成、表示、編集、削除を行いました。
+この節では顧客の読み書きを行えるアプリを作りました。
 
-この４つのデータの操作は CRUD と呼ばれて基本的な操作です。今後のこの組み合わせで様々な機能追加を進めていきます。
+作成・取得・更新・削除の４つのデータの操作は CRUD と呼ばれる基本的な操作です。
+今後のこの組み合わせで様々な機能追加を進めていきます。
 
-- Create: 作成
-- Read: 読み込み
-- Update: 更新
-- Delete: 削除
+操作に対してのまとまりをかくにん
+```mermaid
+graph TD
+  Write["Write
+  書き込み"]
+  Create["Create
+  作成"]
+  Read["Read
+  取得"]
+  Update["Update
+  更新"]
+  Delete["Delete
+  削除"]
+  Get["Get
+  単一取得"]
+  List["List
+  一覧取得"]
+
+  Read --> Get
+  Read --> List
+  Write --> Create
+  Write --> Update
+  Write --> Delete
+
+
+```
+
 
 次の章ではここに機能追加をします。
-ｓ
+
 [次の機能追加](./02-team.md)

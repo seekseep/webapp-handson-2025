@@ -42,6 +42,8 @@ erDiagram
   team ||--o{ employee : has
 ```
 
+データ構造については [データベースについて](../02-hono-basic/04-database.md) のはじめに図解しています。
+
 厳密に値を表すときもあります。
 
 ```mermaid
@@ -65,6 +67,8 @@ erDiagram
 ```
 
 次のような画面遷移を説明する図も使います。
+
+ここでは主な遷移方法に着目しています。
 
 ```mermaid
 graph LR
@@ -114,3 +118,21 @@ graph LR
 ```
 
 localStorage へのアクセスは同期処理で行えますが、　**WebAPIに置き換えられるように非同期処理で行います。**
+
+# 画面の装飾について
+
+この章では画面の装飾については触れません。
+
+余裕がある人は CSS を使って装飾してみてください。
+
+その他にも次のようなライブラリを使うこともできます。
+
+- [MUI](https://mui.com/)
+- [Bootstrap](https://getbootstrap.com/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Ant Design](https://ant.design/)
+- [Chakra UI](https://chakra-ui.com/)
+
+それでは始めていきましょう。
+
+[はじめる](./01-cutomer.md)
