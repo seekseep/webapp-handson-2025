@@ -130,7 +130,7 @@ export default TeamCreate;
 
 ```
 
-#　パスの設定
+# パスの設定
 
 次のようにパスを設定してください。
 
@@ -377,7 +377,7 @@ export async function getTeam (id) {
   return teams[id]
 }
 
-export async function updateTem (team) {
+export async function updateTeam (team) {
   if (!teams[team.id]) throw new Error('組織が見つかりません')
   teams[team.id] = team
   save()
