@@ -408,10 +408,12 @@ erDiagram
 `src/routes/CustomerCreate.jsx`
 
 ```jsx
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
+
 function CustomerCreate () {
-  const [values, setValues] = React.useState({
+  const [values, setValues] = useState({
     name: '',
     email: '',
     tel: '',
@@ -523,7 +525,8 @@ function createCustomerId () {
 }
 
 export async function createCustomer (customer) {
-  customers[customer.id] = createCustomerId()
+  customer.id = createCustomerId()
+  customers[customer.id] = customer
   console.log(customers)
 }
 
@@ -581,7 +584,8 @@ function createCustomerId () {
 }
 
 export async function createCustomer (customer) {
-  customers[customer.id] = createCustomerId()
+  customer.id = createCustomerId()
+  customers[customer.id] = customer
   console.log(customers)
 }
 
@@ -627,7 +631,6 @@ function CustomerCollection () {
     load()
   }, [])
 
-  const customers = getCustomers()
   return (
     <div>
       <h1>顧客一覧</h1>
@@ -1143,7 +1146,8 @@ createRoot(document.getElementById('root')).render(
 作成・取得・更新・削除の４つのデータの操作は CRUD と呼ばれる基本的な操作です。
 今後のこの組み合わせで様々な機能追加を進めていきます。
 
-操作に対してのまとまりをかくにん
+操作に対してのまとまりを確認しましょう。
+
 ```mermaid
 graph TD
   Write["Write
@@ -1166,11 +1170,8 @@ graph TD
   Write --> Create
   Write --> Update
   Write --> Delete
-
-
 ```
 
-
-次の章ではここに機能追加をします。
+次の節では友人からの意見に対応していきましょう。
 
 [次の機能追加](./02-team.md)
