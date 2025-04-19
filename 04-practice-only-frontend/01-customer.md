@@ -291,9 +291,9 @@ export default CustomerCreate
 
 | URL | 画面 |
 | --- | --- |
-| `http://localhost:3000/` | 顧客一覧 |
-| `http://localhost:3000/1` | 顧客詳細 |
-| `http://localhost:3000/new` | 顧客作成 |
+| `http://localhost:5173/` | 顧客一覧 |
+| `http://localhost:5173/1` | 顧客詳細 |
+| `http://localhost:5173/new` | 顧客作成 |
 
 ```mermaid
 graph LR
@@ -410,7 +410,6 @@ erDiagram
 ```jsx
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-
 
 function CustomerCreate () {
   const [values, setValues] = useState({
@@ -606,7 +605,7 @@ export async function getCustomers () {
 詳しくは [非同期処理](../01-react-basic/05-async.md) を参照してください。
 
 ```jsx
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { getCustomers } from '../storage'
 
@@ -744,6 +743,7 @@ export async function getCustomer (id) {
 `/:id` の部分が `param.id` に入ります。
 
 ```jsx
+import { useState, useEffect } from 'react'
 import { Link, useParams } from "react-router-dom"
 import { getCustomer } from "../storage"
 
@@ -834,6 +834,7 @@ WebAPIを利用する場合はWebAPIがエラーを返すことが一般的で�
 ID は変更できないようにします。
 
 ```jsx
+import { useState, useEffect } from 'react'
 import { Link, useParams } from "react-router-dom"
 import { getCustomer } from "../storage"
 
